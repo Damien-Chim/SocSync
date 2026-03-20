@@ -25,10 +25,7 @@ export function AppHeader() {
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-6">
       <div>
-        <h1 className="text-lg font-semibold text-foreground">Welcome back!</h1>
-        <p className="text-sm text-muted-foreground">
-          Discover what&apos;s happening on campus
-        </p>
+        <h1 className="text-3xl font-semibold text-foreground">Hi, xxx !</h1>
       </div>
 
       <div className="flex items-center gap-3">

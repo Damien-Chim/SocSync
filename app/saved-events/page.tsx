@@ -36,10 +36,7 @@ export default function SavedEventsPage() {
       <div className="space-y-6">
         {/* Page Header */}
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Saved Events</h1>
-          <p className="text-muted-foreground mt-1">
-            Events you&apos;ve saved or registered for
-          </p>
+          <h1 className="text-4xl font-bold text-foreground">Saved Events</h1>
         </div>
 
         {/* Tabs */}

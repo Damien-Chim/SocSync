@@ -22,10 +22,7 @@ export default function MapPage() {
       <div className="space-y-6 h-[calc(100vh-8rem)]">
         {/* Page Header */}
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Event Map</h1>
-          <p className="text-muted-foreground mt-1">
-            Find events happening near you
-          </p>
+          <h1 className="text-4xl font-bold text-foreground">Event Map</h1>
         </div>
 
         {/* Map Container */}
