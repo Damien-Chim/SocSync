@@ -1,6 +1,17 @@
 export type UserRole = 'student' | 'host';
 
-export type EventCategory = 'Tech' | 'Finance' | 'Industry' | 'Social' | 'Networking';
+export const EVENT_CATEGORIES = [
+  'Tech',
+  'Finance',
+  'Career',
+  'Workshop',
+  'Competition',
+  'Social',
+  'Arts & Culture',
+  'Networking',
+] as const;
+
+export type EventCategory = (typeof EVENT_CATEGORIES)[number];
 
 export interface Society {
   id: string;

@@ -18,9 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Upload, MapPin, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import type { EventCategory } from "@/lib/types";
-
-const categories: EventCategory[] = ["Tech", "Finance", "Industry", "Social", "Networking"];
+import { EVENT_CATEGORIES, type EventCategory } from "@/lib/types";
 
 export default function CreateEventPage() {
   const router = useRouter();
@@ -114,7 +112,7 @@ export default function CreateEventPage() {
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                   <SelectContent>
-                    {categories.map((cat) => (
+                    {EVENT_CATEGORIES.map((cat) => (
                       <SelectItem key={cat} value={cat}>
                         {cat}
                       </SelectItem>

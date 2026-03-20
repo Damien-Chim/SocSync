@@ -8,13 +8,13 @@ import { mockEvents, mockUser } from "@/lib/mock-data";
 import type { EventCategory } from "@/lib/types";
 
 export default function DashboardPage() {
-  const [selectedCategory, setSelectedCategory] = useState<EventCategory | "All">("All");
+  const [selectedCategories, setSelectedCategories] = useState<EventCategory[]>([]);
   const [freeFoodOnly, setFreeFoodOnly] = useState(false);
   const [freeEventsOnly, setFreeEventsOnly] = useState(false);
 
   const filteredEvents = useMemo(() => {
     return mockEvents.filter((event) => {
-      if (selectedCategory !== "All" && event.category !== selectedCategory) {
+      if (selectedCategories.length > 0 && !selectedCategories.includes(event.category)) {
         return false;
       }
       if (freeFoodOnly && !event.hasFreeFood) {
@@ -25,7 +25,7 @@ export default function DashboardPage() {
       }
       return true;
     });
-  }, [selectedCategory, freeFoodOnly, freeEventsOnly]);
+  }, [selectedCategories, freeFoodOnly, freeEventsOnly]);
 
   return (
     <AppShell userRole="student">
@@ -40,8 +40,8 @@ export default function DashboardPage() {
 
         {/* Filter Bar */}
         <FilterBar
-          selectedCategory={selectedCategory}
-          onCategoryChange={setSelectedCategory}
+          selectedCategories={selectedCategories}
+          onCategoryChange={setSelectedCategories}
           freeFoodOnly={freeFoodOnly}
           onFreeFoodChange={setFreeFoodOnly}
           freeEventsOnly={freeEventsOnly}

@@ -1,85 +1,140 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { UtensilsCrossed, Ticket } from "lucide-react";
-import type { EventCategory } from "@/lib/types";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Checkbox } from "@/components/ui/checkbox";
+import { EVENT_CATEGORIES, type EventCategory } from "@/lib/types";
+import { ChevronDown } from "lucide-react";
 
 interface FilterBarProps {
-  selectedCategory: EventCategory | "All";
-  onCategoryChange: (category: EventCategory | "All") => void;
+  selectedCategories: EventCategory[];
+  onCategoryChange: (categories: EventCategory[]) => void;
   freeFoodOnly: boolean;
   onFreeFoodChange: (value: boolean) => void;
   freeEventsOnly: boolean;
   onFreeEventsChange: (value: boolean) => void;
 }
 
-const categories: (EventCategory | "All")[] = [
-  "All",
-  "Tech",
-  "Finance",
-  "Industry",
-  "Social",
-  "Networking",
-];
-
 export function FilterBar({
-  selectedCategory,
+  selectedCategories,
   onCategoryChange,
   freeFoodOnly,
   onFreeFoodChange,
   freeEventsOnly,
   onFreeEventsChange,
 }: FilterBarProps) {
+  const categoryLabel =
+    selectedCategories.length === 0
+      ? "All categories"
+      : selectedCategories.length <= 2
+        ? selectedCategories.join(", ")
+        : `${selectedCategories.length} categories selected`;
+  const selectedExtras = [
+    freeFoodOnly ? "Free food" : null,
+    freeEventsOnly ? "Free entry" : null,
+  ].filter(Boolean) as string[];
+  const extraLabel =
+    selectedExtras.length === 0
+      ? "Any extras"
+      : selectedExtras.length <= 2
+        ? selectedExtras.join(", ")
+        : `${selectedExtras.length} extras selected`;
+
+  const toggleCategory = (category: EventCategory, checked: boolean) => {
+    if (checked) {
+      onCategoryChange([...selectedCategories, category]);
+      return;
+    }
+
+    onCategoryChange(selectedCategories.filter((item) => item !== category));
+  };
+
   return (
-    <div className="flex flex-col lg:flex-row lg:items-center gap-4 p-4 rounded-xl bg-card border border-border">
-      {/* Category Pills */}
-      <div className="flex flex-wrap gap-2">
-        {categories.map((category) => (
-          <button
-            key={category}
-            onClick={() => onCategoryChange(category)}
-            className={cn(
-              "px-4 py-2 rounded-full text-sm font-medium transition-all duration-200",
-              selectedCategory === category
-                ? "bg-primary text-primary-foreground shadow-md"
-                : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
-            )}
-          >
-            {category}
-          </button>
-        ))}
+    <div className="grid gap-4 rounded-xl border border-border bg-card p-4 md:grid-cols-2">
+      <div className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          Category
+        </p>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              className="h-11 w-full justify-between bg-background px-3 font-normal"
+            >
+              <span className="truncate">{categoryLabel}</span>
+              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-[var(--radix-dropdown-menu-trigger-width)]">
+            <DropdownMenuLabel>Choose categories</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {EVENT_CATEGORIES.map((category) => (
+              <DropdownMenuItem
+                key={category}
+                onSelect={(event) => {
+                  event.preventDefault();
+                  toggleCategory(category, !selectedCategories.includes(category));
+                }}
+                className="gap-3"
+              >
+                <Checkbox
+                  checked={selectedCategories.includes(category)}
+                  className="pointer-events-none"
+                  aria-hidden="true"
+                />
+                {category}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
-      {/* Divider */}
-      <div className="hidden lg:block h-8 w-px bg-border" />
-
-      {/* Toggle Filters */}
-      <div className="flex items-center gap-3">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onFreeFoodChange(!freeFoodOnly)}
-          className={cn(
-            "gap-2 transition-all duration-200",
-            freeFoodOnly && "bg-amber-500/10 border-amber-500 text-amber-700 hover:bg-amber-500/20"
-          )}
-        >
-          <UtensilsCrossed className="h-4 w-4" />
-          Free Food
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onFreeEventsChange(!freeEventsOnly)}
-          className={cn(
-            "gap-2 transition-all duration-200",
-            freeEventsOnly && "bg-emerald-500/10 border-emerald-500 text-emerald-700 hover:bg-emerald-500/20"
-          )}
-        >
-          <Ticket className="h-4 w-4" />
-          Free Entry
-        </Button>
+      <div className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          Extra Filter
+        </p>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              className="h-11 w-full justify-between bg-background px-3 font-normal"
+            >
+              <span className="truncate">{extraLabel}</span>
+              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-[var(--radix-dropdown-menu-trigger-width)]">
+            <DropdownMenuLabel>Choose extras</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onSelect={(event) => {
+                event.preventDefault();
+                onFreeFoodChange(!freeFoodOnly);
+              }}
+              className="gap-3"
+            >
+              <Checkbox checked={freeFoodOnly} className="pointer-events-none" aria-hidden="true" />
+              Free food
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={(event) => {
+                event.preventDefault();
+                onFreeEventsChange(!freeEventsOnly);
+              }}
+              className="gap-3"
+            >
+              <Checkbox checked={freeEventsOnly} className="pointer-events-none" aria-hidden="true" />
+              Free entry
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
