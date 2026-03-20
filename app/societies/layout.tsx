@@ -14,7 +14,7 @@ export default function SocietiesLayout({
 
   const tabs = [
     { href: "/societies/discover", label: "Discover" },
-    { href: "/societies/liked", label: "Liked" },
+    { href: "/societies/liked", label: "Followed" },
   ];
 
   return (
