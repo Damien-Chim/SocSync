@@ -72,7 +72,7 @@ function SocietiesLayoutContent({
           <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch">
             <div className="flex h-full flex-col gap-4">
               <div className="space-y-1">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                <p className="text-xs px-4 font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                   Recommended for you
                 </p>
               </div>
@@ -88,7 +88,7 @@ function SocietiesLayoutContent({
             </div>
 
             <div className="flex h-full flex-col gap-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              <p className="text-xs px-4 font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                 Trending societies
               </p>
 
