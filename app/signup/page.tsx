@@ -3,12 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Zap, Eye, EyeOff, Upload, User, Building2 } from "lucide-react";
+import { Zap, Eye, EyeOff, Upload, User, Building2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 
 type UserRole = "student" | "host";
 
@@ -16,6 +17,8 @@ export default function SignupPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState<UserRole>("student");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -23,14 +26,45 @@ export default function SignupPage() {
     societyName: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock signup - redirect based on role
-    if (role === "host") {
-      router.push("/host/dashboard");
-    } else {
-      router.push("/dashboard");
+    setLoading(true);
+    setError(null);
+
+    const supabase = createClient();
+
+    console.log("[Signup] Attempting signup for:", formData.email, "role:", role);
+
+    const { data, error: authError } = await supabase.auth.signUp({
+      email: formData.email,
+      password: formData.password,
+      options: {
+        data: {
+          name: formData.name,
+          role: role,
+          society_name: role === "host" ? formData.societyName : undefined,
+        },
+      },
+    });
+
+    if (authError) {
+      console.error("[Signup] Auth error:", authError.message, authError);
+      setError(authError.message);
+      setLoading(false);
+      return;
     }
+
+    console.log("[Signup] Success! User:", data.user?.id);
+
+    if (!data.session) {
+      setLoading(false);
+      alert("Check your email for a confirmation link, then sign in.");
+      router.push("/login");
+      return;
+    }
+
+    router.push(role === "host" ? "/host/dashboard" : "/dashboard");
+    router.refresh();
   };
 
   return (
@@ -83,6 +117,12 @@ export default function SignupPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              {error && (
+                <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm">
+                  {error}
+                </div>
+              )}
+
               <div className="space-y-2">
                 <Label htmlFor="name">{role === "host" ? "Your Name" : "Full Name"}</Label>
                 <Input
@@ -142,10 +182,11 @@ export default function SignupPage() {
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Create a password"
+                    placeholder="Create a password (min 6 characters)"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     required
+                    minLength={6}
                     className="h-11 pr-10"
                   />
                   <button
@@ -158,16 +199,24 @@ export default function SignupPage() {
                 </div>
               </div>
 
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
+                disabled={loading}
                 className={cn(
                   "w-full h-11 text-base font-semibold",
-                  role === "host" 
-                    ? "bg-accent text-accent-foreground hover:bg-accent/90" 
+                  role === "host"
+                    ? "bg-accent text-accent-foreground hover:bg-accent/90"
                     : "bg-primary hover:bg-primary/90"
                 )}
               >
-                Create Account
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating account...
+                  </>
+                ) : (
+                  "Create Account"
+                )}
               </Button>
             </form>
 
