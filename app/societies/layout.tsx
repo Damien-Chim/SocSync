@@ -58,7 +58,7 @@ function SocietiesLayoutContent({
                 Student communities
               </Badge>
               <div className="space-y-2">
-                <h1 className="text-3xl font-semibold tracking-[-0.04em] text-foreground sm:text-5xl lg:text-[4rem] lg:leading-[1]">
+                <h1 className="text-4xl font-semibold tracking-[-0.04em] text-foreground sm:text-5xl">
                   Find the societies that actually fit your campus life.
                 </h1>
               </div>
