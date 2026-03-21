@@ -13,6 +13,7 @@ import {
   Zap,
   PlusCircle,
   BarChart3,
+  LogOut,
 } from "lucide-react";
 
 interface AppSidebarProps {
@@ -76,7 +77,7 @@ export function AppSidebar({ userRole }: AppSidebarProps) {
         </nav>
 
         {/* User section */}
-        <div className="border-t border-sidebar-border p-4">
+        <div className="border-t border-sidebar-border p-4 space-y-2">
           <div className="flex items-center gap-3 rounded-lg bg-sidebar-accent/30 px-3 py-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-sidebar-primary text-sm font-semibold text-sidebar-primary-foreground">
               {userRole === "host" ? "H" : "S"}
@@ -90,6 +91,15 @@ export function AppSidebar({ userRole }: AppSidebarProps) {
               </p>
             </div>
           </div>
+          <form action="/auth/signout" method="POST">
+            <button
+              type="submit"
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground/70 hover:bg-destructive/10 hover:text-destructive transition-all duration-200"
+            >
+              <LogOut className="h-5 w-5" />
+              Sign Out
+            </button>
+          </form>
         </div>
       </div>
     </aside>
