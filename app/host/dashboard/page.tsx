@@ -190,6 +190,11 @@ export default function HostDashboardPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
+                    <Link href={`/host/edit-event/${event.id}`}>
+                      <Button variant="ghost" size="icon">
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                    </Link>
                     <Button
                       variant="ghost"
                       size="icon"
