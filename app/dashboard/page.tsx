@@ -175,11 +175,11 @@ function DashboardContent() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-transparent" />
                     <FeaturedBookmark eventId={featuredEvent.id} />
-                    <div className="absolute inset-x-0 top-0 flex items-center justify-between p-5">
+                    <div className="absolute inset-x-0 top-0 flex items-center justify-between gap-3 p-5 pr-20">
                       <Badge className="rounded-full bg-white/15 text-white backdrop-blur-sm hover:bg-white/20">
                         Latest event
                       </Badge>
-                      <Badge className="rounded-full bg-black/30 text-white backdrop-blur-sm hover:bg-black/40">
+                      <Badge className="max-w-full rounded-full bg-black/30 text-white backdrop-blur-sm hover:bg-black/40">
                         {featuredEvent.category}
                       </Badge>
                     </div>
@@ -258,13 +258,10 @@ function DashboardContent() {
               </Card>
 
               <Card className="border-border/60 bg-card/70 shadow-[0_18px_45px_rgba(24,24,27,0.06)]">
-                <CardContent className="space-y-4 p-5">
+                <CardContent className="space-y-4">
                   <div className="space-y-1">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                      Easy Picks
-                    </p>
                     <h3 className="text-xl font-semibold tracking-[-0.02em] text-foreground">
-                      Good options when you want low-friction plans.
+                      FREE ENTRIES
                     </h3>
                   </div>
 
@@ -296,26 +293,10 @@ function DashboardContent() {
               </div>
 
               {allUpcomingEvents.length > 0 ? (
-                <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-                  <div className="grid gap-6 sm:grid-cols-2">
-                    {allUpcomingEvents.slice(0, 4).map((event) => (
-                      <EventCard key={event.id} event={event} />
-                    ))}
-                  </div>
-
-                  <Card className="border-border/60 bg-card shadow-[0_12px_35px_rgba(24,24,27,0.05)]">
-                    <CardContent className="space-y-1 p-3">
-                      {allUpcomingEvents.slice(4).length > 0 ? (
-                        allUpcomingEvents.slice(4).map((event) => (
-                          <ListEventRow key={event.id} event={event} />
-                        ))
-                      ) : (
-                        <p className="px-3 py-8 text-sm text-muted-foreground">
-                          Your filters are narrow right now, so the board is intentionally focused.
-                        </p>
-                      )}
-                    </CardContent>
-                  </Card>
+                <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                  {allUpcomingEvents.map((event) => (
+                    <EventCard key={event.id} event={event} />
+                  ))}
                 </div>
               ) : (
                 <p className="rounded-3xl border border-dashed border-border bg-card/40 px-6 py-10 text-center text-sm text-muted-foreground">
@@ -379,33 +360,6 @@ function CompactEventRow({ event }: { event: Event }) {
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-function ListEventRow({ event }: { event: Event }) {
-  return (
-    <div className="flex items-start justify-between gap-4 rounded-[1.2rem] px-3 py-3 transition-colors hover:bg-muted/50">
-      <div className="min-w-0">
-        <div className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-primary" />
-          <p className="truncate text-sm font-semibold text-foreground">{event.title}</p>
-        </div>
-        <p className="mt-1 text-sm text-muted-foreground">{event.society.name}</p>
-        <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <Calendar className="h-3.5 w-3.5" />
-            {formatDate(event.date)}
-          </span>
-          <span className="flex items-center gap-1">
-            <MapPin className="h-3.5 w-3.5" />
-            {event.location.split(",")[0]}
-          </span>
-        </div>
-      </div>
-      <Badge variant="secondary" className="shrink-0 rounded-full">
-        {event.category}
-      </Badge>
     </div>
   );
 }

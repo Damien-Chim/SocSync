@@ -28,6 +28,7 @@ interface SocietiesContextValue {
   categoryCount: number;
   loading: boolean;
   eventCounts: Record<string, number>;
+  weeklyEventCounts: Record<string, number>;
 }
 
 const SocietiesContext = createContext<SocietiesContextValue | null>(null);
@@ -35,6 +36,7 @@ const SocietiesContext = createContext<SocietiesContextValue | null>(null);
 export function SocietiesProvider({ children }: { children: ReactNode }) {
   const [societies, setSocieties] = useState<Society[]>([]);
   const [eventCounts, setEventCounts] = useState<Record<string, number>>({});
+  const [weeklyEventCounts, setWeeklyEventCounts] = useState<Record<string, number>>({});
   const [followedIds, setFollowedIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
@@ -69,6 +71,32 @@ export function SocietiesProvider({ children }: { children: ReactNode }) {
           counts[s.id] = s.event_count ?? 0;
         }
         setEventCounts(counts);
+      }
+
+      const now = new Date();
+      const day = now.getDay();
+      const diffToMonday = (day + 6) % 7;
+      const startOfWeek = new Date(now);
+      startOfWeek.setHours(0, 0, 0, 0);
+      startOfWeek.setDate(now.getDate() - diffToMonday);
+
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(startOfWeek.getDate() + 7);
+
+      const { data: weeklyEvents, error: weeklyError } = await supabase
+        .from("events")
+        .select("society_id, date")
+        .gte("date", startOfWeek.toISOString().slice(0, 10))
+        .lt("date", endOfWeek.toISOString().slice(0, 10));
+
+      if (weeklyError) {
+        console.error("[Societies] Failed to load weekly event counts:", weeklyError.message);
+      } else if (weeklyEvents) {
+        const weeklyCounts: Record<string, number> = {};
+        for (const event of weeklyEvents) {
+          weeklyCounts[event.society_id] = (weeklyCounts[event.society_id] ?? 0) + 1;
+        }
+        setWeeklyEventCounts(weeklyCounts);
       }
 
       // Fetch follows for logged-in user
@@ -166,8 +194,9 @@ export function SocietiesProvider({ children }: { children: ReactNode }) {
       categoryCount: EVENT_CATEGORIES.length,
       loading,
       eventCounts,
+      weeklyEventCounts,
     }),
-    [societies, followedIds, toggleFollow, searchQuery, selectedCategory, sortBy, loading, eventCounts]
+    [societies, followedIds, toggleFollow, searchQuery, selectedCategory, sortBy, loading, eventCounts, weeklyEventCounts]
   );
 
   return <SocietiesContext.Provider value={value}>{children}</SocietiesContext.Provider>;

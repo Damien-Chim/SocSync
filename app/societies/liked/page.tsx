@@ -56,24 +56,13 @@ export default function LikedSocietiesPage() {
     <div className="space-y-6">
       <SocietiesControls />
 
-      <section className="rounded-[1.75rem] border border-border/60 bg-card/50 p-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              Your list
-            </p>
-            <h2 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">
-              Societies you actually want to hear from.
-            </h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Keep this list tight so your feed stays useful instead of noisy.
-            </p>
-          </div>
-          <Badge variant="secondary" className="w-fit rounded-full px-3 py-1">
-            {likedSocieties.length} followed
-          </Badge>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">
+            Following
+          </h2>
         </div>
-      </section>
+      </div>
 
       <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
         {likedSocieties.map((society) => (

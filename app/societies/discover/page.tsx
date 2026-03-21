@@ -67,9 +67,6 @@ export default function DiscoverSocietiesPage() {
               Browse the full directory.
             </h2>
           </div>
-          <Badge variant="secondary" className="rounded-full px-3 py-1">
-            {filteredSocieties.length} shown
-          </Badge>
         </div>
 
         {filteredSocieties.length > 0 ? (
