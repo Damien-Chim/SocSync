@@ -9,6 +9,7 @@ import { FilterBar } from "@/components/filter-bar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import type { Event, EventCategory } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client";
@@ -59,9 +60,19 @@ function mapDbEventToEvent(row: Record<string, unknown>): Event {
   };
 }
 
+function getEventTimestamp(event: Event) {
+  const time = event.time || "00:00";
+  return new Date(`${event.date}T${time}`).getTime();
+}
+
+function getEventDateTimestamp(event: Event) {
+  return new Date(`${event.date}T00:00:00`).getTime();
+}
+
 function DashboardContent() {
   const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<EventCategory[]>([]);
   const [freeFoodOnly, setFreeFoodOnly] = useState(false);
   const [freeEventsOnly, setFreeEventsOnly] = useState(false);
@@ -86,8 +97,63 @@ function DashboardContent() {
     loadEvents();
   }, [supabase]);
 
-  const filteredEvents = useMemo(() => {
-    return allEvents.filter((event) => {
+  const now = Date.now();
+
+  const futureEvents = useMemo(() => {
+    return allEvents.filter((event) => getEventTimestamp(event) >= now);
+  }, [allEvents, now]);
+
+  const featuredCandidates = useMemo(() => {
+    return [...futureEvents].sort((a, b) => {
+      const dateDiff = getEventDateTimestamp(a) - getEventDateTimestamp(b);
+      if (dateDiff !== 0) {
+        return dateDiff;
+      }
+      return b.saveCount - a.saveCount;
+    });
+  }, [futureEvents]);
+
+  const freeEntriesByDate = useMemo(() => {
+    return [...futureEvents]
+      .filter((event) => event.price === "Free")
+      .sort((a, b) => {
+        const dateDiff = getEventDateTimestamp(a) - getEventDateTimestamp(b);
+        if (dateDiff !== 0) {
+          return dateDiff;
+        }
+        return b.saveCount - a.saveCount;
+      });
+  }, [futureEvents]);
+
+  const sortedByEventTime = useMemo(() => {
+    return [...allEvents].sort((a, b) => {
+      return getEventTimestamp(a) - getEventTimestamp(b);
+    });
+  }, [allEvents]);
+
+  const filteredUpcomingEvents = useMemo(() => {
+    return sortedByEventTime.filter((event) => {
+      if (getEventTimestamp(event) < now) {
+        return false;
+      }
+
+      const normalizedQuery = searchQuery.trim().toLowerCase();
+
+      if (
+        normalizedQuery &&
+        ![
+          event.title,
+          event.description,
+          event.society.name,
+          event.location,
+          event.category,
+        ]
+          .join(" ")
+          .toLowerCase()
+          .includes(normalizedQuery)
+      ) {
+        return false;
+      }
       if (selectedCategories.length > 0 && !selectedCategories.includes(event.category)) {
         return false;
       }
@@ -99,13 +165,11 @@ function DashboardContent() {
       }
       return true;
     });
-  }, [allEvents, selectedCategories, freeFoodOnly, freeEventsOnly]);
+  }, [sortedByEventTime, searchQuery, selectedCategories, freeFoodOnly, freeEventsOnly]);
 
-  const featuredEvent = filteredEvents[0];
-  const freeAndEasyEvents = filteredEvents
-    .filter((event) => event.price === "Free")
-    .slice(0, 3);
-  const allUpcomingEvents = filteredEvents.slice(featuredEvent ? 1 : 0);
+  const featuredEvent = featuredCandidates[0];
+  const freeAndEasyEvents = freeEntriesByDate.slice(0, 3);
+  const allUpcomingEvents = filteredUpcomingEvents;
 
   if (loading) {
     return (
@@ -121,91 +185,69 @@ function DashboardContent() {
     <AppShell userRole="student">
       <div className="space-y-8">
         <section className="overflow-hidden rounded-[2rem] border border-border/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(250,246,255,0.9)_45%,rgba(255,243,228,0.92))] shadow-[0_24px_80px_rgba(24,24,27,0.08)]">
-          <div className="grid gap-8 px-6 py-7 lg:grid-cols-[1.35fr_0.9fr] lg:px-8">
+          <div className="px-6 py-7 lg:px-8">
             <div className="space-y-5">
-              <div className="flex items-start justify-between gap-4">
-                <div className="space-y-3">
-                  <Badge className="rounded-full bg-foreground text-background hover:bg-foreground/90">
-                    This week on campus
-                  </Badge>
-                  <div className="space-y-2">
-                    <h1 className="max-w-xl text-4xl font-semibold tracking-[-0.04em] text-foreground sm:text-5xl">
-                      What&apos;s worth leaving your room for.
-                    </h1>
-                  </div>
+              <div className="space-y-3">
+                <Badge className="rounded-full bg-foreground text-background hover:bg-foreground/90">
+                  Campus event picks
+                </Badge>
+                <div className="space-y-2">
+                  <h1 className="max-w-none text-4xl font-semibold tracking-[-0.04em] text-foreground sm:text-5xl lg:text-[3.4rem]">
+                    What&apos;s worth leaving your room for.
+                  </h1>
                 </div>
               </div>
-            </div>
-
-            <div className="rounded-[1.6rem] border border-border/60 bg-white/70 p-4 backdrop-blur-sm">
-              <div className="mb-3 flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                    Discovery mode
-                  </p>
-                  <p className="mt-1 text-sm text-foreground">
-                    Keep the controls light and let the event picks do the work.
-                  </p>
-                </div>
-              </div>
-              <FilterBar
-                selectedCategories={selectedCategories}
-                onCategoryChange={setSelectedCategories}
-                freeFoodOnly={freeFoodOnly}
-                onFreeFoodChange={setFreeFoodOnly}
-                freeEventsOnly={freeEventsOnly}
-                onFreeEventsChange={setFreeEventsOnly}
-              />
             </div>
           </div>
         </section>
 
-        {filteredEvents.length > 0 && featuredEvent ? (
+        {allEvents.length > 0 && featuredEvent ? (
           <div className="space-y-8">
-            <section className="grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
+            <section>
+              <div className="grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
               <Card className="overflow-hidden border-border/60 bg-card shadow-[0_18px_50px_rgba(24,24,27,0.08)]">
+                <div className="px-6">
+                  <h3 className="text-xl font-semibold tracking-[-0.02em] text-foreground">
+                      FEATURED EVENT
+                    </h3>
+                </div>
+
                 <div className="grid gap-0 lg:grid-cols-[1.15fr_0.85fr]">
-                  <div className="relative min-h-[18rem] overflow-hidden">
-                    <Image
-                      src={featuredEvent.bannerImage}
-                      alt={featuredEvent.title}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 55vw"
-                      className="object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-transparent" />
-                    <FeaturedBookmark eventId={featuredEvent.id} />
-                    <div className="absolute inset-x-0 top-0 flex items-center justify-between gap-3 p-5 pr-20">
-                      <Badge className="rounded-full bg-white/15 text-white backdrop-blur-sm hover:bg-white/20">
-                        Latest event
-                      </Badge>
-                      <Badge className="max-w-full rounded-full bg-black/30 text-white backdrop-blur-sm hover:bg-black/40">
-                        {featuredEvent.category}
-                      </Badge>
-                    </div>
-                    <div className="absolute inset-x-0 bottom-0 space-y-4 p-5 text-white">
-                      <div className="space-y-2">
-                        <p className="text-sm text-white/80">{featuredEvent.society.name}</p>
-                        <h2 className="max-w-xl text-3xl font-semibold tracking-[-0.03em]">
-                          {featuredEvent.title}
-                        </h2>
-                        <p className="max-w-lg text-sm leading-6 text-white/80">
-                          {featuredEvent.description}
-                        </p>
-                      </div>
-                      <div className="flex flex-wrap gap-5 text-sm text-white/85">
-                        <span className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4" />
-                          {formatDate(featuredEvent.date)}
-                        </span>
-                        <span className="flex items-center gap-2">
-                          <Clock className="h-4 w-4" />
-                          {featuredEvent.time}
-                        </span>
-                        <span className="flex items-center gap-2">
-                          <MapPin className="h-4 w-4" />
-                          {featuredEvent.location}
-                        </span>
+                  <div className="p-4 pb-0 lg:p-4 lg:pr-0">
+                    <div className="relative min-h-[18rem] overflow-hidden rounded-[1.6rem]">
+                      <Image
+                        src={featuredEvent.bannerImage}
+                        alt={featuredEvent.title}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 55vw"
+                        className="object-cover object-center"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-transparent" />
+                      <FeaturedBookmark eventId={featuredEvent.id} />
+                      <div className="absolute inset-x-0 bottom-0 space-y-4 p-5 text-white">
+                        <div className="space-y-2">
+                          <p className="text-sm text-white/80">{featuredEvent.society.name}</p>
+                          <h2 className="max-w-xl text-3xl font-semibold tracking-[-0.03em]">
+                            {featuredEvent.title}
+                          </h2>
+                          <p className="max-w-lg text-sm leading-6 text-white/80">
+                            {featuredEvent.description}
+                          </p>
+                        </div>
+                        <div className="flex flex-wrap gap-5 text-sm text-white/85">
+                          <span className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4" />
+                            {formatDate(featuredEvent.date)}
+                          </span>
+                          <span className="flex items-center gap-2">
+                            <Clock className="h-4 w-4" />
+                            {featuredEvent.time}
+                          </span>
+                          <span className="flex items-center gap-2">
+                            <MapPin className="h-4 w-4" />
+                            {featuredEvent.location}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -278,17 +320,44 @@ function DashboardContent() {
                   </div>
                 </CardContent>
               </Card>
+              </div>
             </section>
 
             <section className="space-y-4">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                    All upcoming
-                  </p>
-                  <h2 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">
-                    Everything else worth scanning.
+                  <h2 className="text-2xl px-4 font-semibold tracking-[-0.03em] text-foreground">
+                    ALL UPCOMING
                   </h2>
+                </div>
+              </div>
+
+              <div className="rounded-[1.6rem] border border-border/60 bg-white/70 p-4 backdrop-blur-sm">
+                <div className="grid gap-4 lg:grid-cols-[1fr_1fr_1.2fr] lg:items-end">
+                  <FilterBar
+                    selectedCategories={selectedCategories}
+                    onCategoryChange={setSelectedCategories}
+                    freeFoodOnly={freeFoodOnly}
+                    onFreeFoodChange={setFreeFoodOnly}
+                    freeEventsOnly={freeEventsOnly}
+                    onFreeEventsChange={setFreeEventsOnly}
+                  />
+
+                  <div className="lg:col-start-3">
+                    <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                      Search
+                    </label>
+                    <div className="relative">
+                      <Search className="pointer-events-none absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        type="search"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search events"
+                        className="h-11 rounded-full border-border/70 bg-background pl-10"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 
