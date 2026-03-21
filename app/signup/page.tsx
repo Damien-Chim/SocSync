@@ -64,26 +64,6 @@ export default function SignupPage() {
 
     console.log("[Signup] Attempting signup for:", formData.email, "role:", role);
 
-    let logoUrl: string | undefined;
-
-    if (role === "host" && logoFile) {
-      const ext = logoFile.name.split(".").pop() ?? "png";
-      const filePath = `society-logos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("SocSync Pics")
-        .upload(filePath, logoFile, { contentType: logoFile.type });
-
-      if (uploadError) {
-        console.error("[Signup] Logo upload error:", uploadError.message);
-      } else {
-        const { data: urlData } = supabase.storage
-          .from("SocSync Pics")
-          .getPublicUrl(filePath);
-        logoUrl = urlData.publicUrl;
-      }
-    }
-
     const { data, error: authError } = await supabase.auth.signUp({
       email: formData.email,
       password: formData.password,
@@ -92,7 +72,6 @@ export default function SignupPage() {
           name: formData.name,
           role: role,
           society_name: role === "host" ? formData.societyName : undefined,
-          society_logo_url: logoUrl,
         },
       },
     });
@@ -111,6 +90,36 @@ export default function SignupPage() {
       alert("Check your email for a confirmation link, then sign in.");
       router.push("/login");
       return;
+    }
+
+    if (role === "host" && logoFile) {
+      const ext = logoFile.name.split(".").pop() ?? "png";
+      const filePath = `society-logos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("SocSync Pics")
+        .upload(filePath, logoFile, { contentType: logoFile.type });
+
+      if (uploadError) {
+        console.error("[Signup] Logo upload error:", uploadError.message);
+      } else {
+        const { data: urlData } = supabase.storage
+          .from("SocSync Pics")
+          .getPublicUrl(filePath);
+
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("society_id")
+          .eq("id", data.user!.id)
+          .single();
+
+        if (profile?.society_id) {
+          await supabase
+            .from("societies")
+            .update({ logo_url: urlData.publicUrl })
+            .eq("id", profile.society_id);
+        }
+      }
     }
 
     router.push(role === "host" ? "/host/dashboard" : "/dashboard");
