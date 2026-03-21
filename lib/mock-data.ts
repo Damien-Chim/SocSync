@@ -2,7 +2,7 @@ import { Society, Event, Notification, User } from './types';
 
 export const mockSocieties: Society[] = [
   {
-    id: '1',
+    id: 'a1b2c3d4-0001-4000-8000-000000000001',
     name: 'Tech Society',
     logo: 'https://api.dicebear.com/7.x/shapes/svg?seed=tech&backgroundColor=7c3aed',
     category: 'Tech',
@@ -10,7 +10,7 @@ export const mockSocieties: Society[] = [
     followerCount: 1234,
   },
   {
-    id: '2',
+    id: 'a1b2c3d4-0002-4000-8000-000000000002',
     name: 'Finance Club',
     logo: 'https://api.dicebear.com/7.x/shapes/svg?seed=finance&backgroundColor=f97316',
     category: 'Finance',
@@ -18,7 +18,7 @@ export const mockSocieties: Society[] = [
     followerCount: 890,
   },
   {
-    id: '3',
+    id: 'a1b2c3d4-0003-4000-8000-000000000003',
     name: 'Business Network',
     logo: 'https://api.dicebear.com/7.x/shapes/svg?seed=business&backgroundColor=06b6d4',
     category: 'Career',
@@ -26,7 +26,7 @@ export const mockSocieties: Society[] = [
     followerCount: 567,
   },
   {
-    id: '4',
+    id: 'a1b2c3d4-0004-4000-8000-000000000004',
     name: 'Social Club',
     logo: 'https://api.dicebear.com/7.x/shapes/svg?seed=social&backgroundColor=ec4899',
     category: 'Social',
@@ -34,7 +34,7 @@ export const mockSocieties: Society[] = [
     followerCount: 2100,
   },
   {
-    id: '5',
+    id: 'a1b2c3d4-0005-4000-8000-000000000005',
     name: 'Networking Hub',
     logo: 'https://api.dicebear.com/7.x/shapes/svg?seed=networking&backgroundColor=22c55e',
     category: 'Networking',
@@ -219,7 +219,7 @@ export const mockUser: User = {
   email: 'student@university.edu',
   name: 'Alex Johnson',
   role: 'student',
-  likedSocieties: ['1', '3', '4'],
+  likedSocieties: ['a1b2c3d4-0001-4000-8000-000000000001', 'a1b2c3d4-0003-4000-8000-000000000003', 'a1b2c3d4-0004-4000-8000-000000000004'],
   savedEvents: ['1', '3', '5'],
 };
 
@@ -228,7 +228,7 @@ export const mockHostUser: User = {
   email: 'host@techsociety.edu',
   name: 'Tech Society Admin',
   role: 'host',
-  societyId: '1',
+  societyId: 'a1b2c3d4-0001-4000-8000-000000000001',
   likedSocieties: [],
   savedEvents: [],
 };
