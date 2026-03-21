@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Zap, Eye, EyeOff, Upload, User, Building2, Loader2 } from "lucide-react";
+import { Zap, Eye, EyeOff, Upload, User, Building2, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -19,12 +20,40 @@ export default function SignupPage() {
   const [role, setRole] = useState<UserRole>("student");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     societyName: "",
   });
+
+  const handleFileSelect = useCallback((file: File) => {
+    if (!file.type.startsWith("image/")) return;
+    setLogoFile(file);
+    const reader = new FileReader();
+    reader.onload = (e) => setLogoPreview(e.target?.result as string);
+    reader.readAsDataURL(file);
+  }, []);
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setIsDragging(false);
+      const file = e.dataTransfer.files[0];
+      if (file) handleFileSelect(file);
+    },
+    [handleFileSelect]
+  );
+
+  const clearLogo = useCallback(() => {
+    setLogoFile(null);
+    setLogoPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,6 +64,26 @@ export default function SignupPage() {
 
     console.log("[Signup] Attempting signup for:", formData.email, "role:", role);
 
+    let logoUrl: string | undefined;
+
+    if (role === "host" && logoFile) {
+      const ext = logoFile.name.split(".").pop() ?? "png";
+      const filePath = `society-logos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("SocSync Pics")
+        .upload(filePath, logoFile, { contentType: logoFile.type });
+
+      if (uploadError) {
+        console.error("[Signup] Logo upload error:", uploadError.message);
+      } else {
+        const { data: urlData } = supabase.storage
+          .from("SocSync Pics")
+          .getPublicUrl(filePath);
+        logoUrl = urlData.publicUrl;
+      }
+    }
+
     const { data, error: authError } = await supabase.auth.signUp({
       email: formData.email,
       password: formData.password,
@@ -43,6 +92,7 @@ export default function SignupPage() {
           name: formData.name,
           role: role,
           society_name: role === "host" ? formData.societyName : undefined,
+          society_logo_url: logoUrl,
         },
       },
     });
@@ -153,12 +203,66 @@ export default function SignupPage() {
 
                   <div className="space-y-2">
                     <Label>Society Logo</Label>
-                    <div className="flex items-center justify-center w-full h-24 border-2 border-dashed border-border rounded-xl hover:border-primary/50 transition-colors cursor-pointer bg-muted/30">
-                      <div className="flex flex-col items-center gap-1 text-muted-foreground">
-                        <Upload className="h-6 w-6" />
-                        <span className="text-sm">Upload logo</span>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleFileSelect(file);
+                      }}
+                    />
+                    {logoPreview ? (
+                      <div className="relative flex items-center gap-4 rounded-xl border-2 border-primary/30 bg-primary/5 p-3">
+                        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg">
+                          <Image
+                            src={logoPreview}
+                            alt="Logo preview"
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium text-foreground">
+                            {logoFile?.name}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {logoFile && (logoFile.size / 1024).toFixed(0)} KB
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={clearLogo}
+                          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
                       </div>
-                    </div>
+                    ) : (
+                      <div
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => fileInputRef.current?.click()}
+                        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") fileInputRef.current?.click(); }}
+                        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                        onDragLeave={() => setIsDragging(false)}
+                        onDrop={handleDrop}
+                        className={cn(
+                          "flex items-center justify-center w-full h-24 border-2 border-dashed rounded-xl transition-colors cursor-pointer",
+                          isDragging
+                            ? "border-primary bg-primary/10"
+                            : "border-border hover:border-primary/50 bg-muted/30"
+                        )}
+                      >
+                        <div className="flex flex-col items-center gap-1 text-muted-foreground">
+                          <Upload className="h-6 w-6" />
+                          <span className="text-sm">
+                            {isDragging ? "Drop image here" : "Click or drag to upload"}
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </>
               )}

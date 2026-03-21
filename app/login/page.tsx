@@ -42,7 +42,9 @@ export default function LoginPage() {
     }
 
     console.log("[Login] Success! User:", data.user?.id);
-    router.push("/dashboard");
+
+    const userRole = data.user?.user_metadata?.role;
+    router.push(userRole === "host" ? "/host/dashboard" : "/dashboard");
     router.refresh();
   };
 
