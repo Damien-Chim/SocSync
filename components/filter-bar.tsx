@@ -57,7 +57,7 @@ export function FilterBar({
   };
 
   return (
-    <div className="grid gap-4 rounded-xl border border-border bg-card p-4 md:grid-cols-2">
+    <div className="grid gap-3 md:grid-cols-2">
       <div className="space-y-2">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
           Category
@@ -66,7 +66,7 @@ export function FilterBar({
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              className="h-11 w-full justify-between bg-background px-3 font-normal"
+              className="h-11 w-full justify-between rounded-full border-border/70 bg-white/80 px-4 font-normal shadow-none"
             >
               <span className="truncate">{categoryLabel}</span>
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
@@ -104,7 +104,7 @@ export function FilterBar({
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              className="h-11 w-full justify-between bg-background px-3 font-normal"
+              className="h-11 w-full justify-between rounded-full border-border/70 bg-white/80 px-4 font-normal shadow-none"
             >
               <span className="truncate">{extraLabel}</span>
               <ChevronDown className="h-4 w-4 text-muted-foreground" />

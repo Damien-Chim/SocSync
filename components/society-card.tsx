@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
-import { Users, Heart } from "lucide-react";
+import { Calendar, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,62 +10,85 @@ import type { Society } from "@/lib/types";
 
 interface SocietyCardProps {
   society: Society;
-  initialFollowed?: boolean;
+  isFollowed: boolean;
+  onToggleFollow: () => void;
+  eventCount?: number;
+  compact?: boolean;
 }
 
-export function SocietyCard({ society, initialFollowed = true }: SocietyCardProps) {
-  const [isFollowed, setIsFollowed] = useState(initialFollowed);
-
+export function SocietyCard({
+  society,
+  isFollowed,
+  onToggleFollow,
+  eventCount = 0,
+  compact = false,
+}: SocietyCardProps) {
   return (
-    <Card className="group overflow-hidden border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-300">
-      <CardContent className="p-5">
-        <div className="flex items-start gap-4">
-          {/* Society Logo */}
-          <div className="relative w-14 h-14 sm:w-16 sm:h-16 flex-shrink-0">
-            <Image
-              src={society.logo}
-              alt={society.name}
-              fill
-              sizes="(max-width: 640px) 56px, 64px"
-              className="rounded-xl bg-muted object-cover"
-            />
-            <div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground shadow-md">
-              <Heart className="h-3 w-3 fill-current" />
+    <Card
+      className={cn(
+        "group overflow-hidden border border-border/70 bg-card shadow-[0_12px_35px_rgba(24,24,27,0.05)] transition-all duration-300 hover:-translate-y-0.5 hover:border-foreground/20 hover:shadow-[0_18px_45px_rgba(24,24,27,0.08)]",
+        compact && "shadow-none"
+      )}
+    >
+      <CardContent className={cn("p-5", compact && "p-0")}>
+        <div className={cn("flex flex-col gap-5", compact && "gap-4")}>
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex min-w-0 items-start gap-4">
+              <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-[1.1rem] bg-muted">
+                <Image
+                  src={society.logo}
+                  alt={society.name}
+                  fill
+                  sizes="64px"
+                  className="object-cover"
+                />
+              </div>
+
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3 className="truncate text-xl font-semibold tracking-[-0.02em] text-foreground">
+                    {society.name}
+                  </h3>
+                  <Badge variant="secondary" className="rounded-full">
+                    {society.category}
+                  </Badge>
+                </div>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  {society.description}
+                </p>
+              </div>
             </div>
+
           </div>
 
-          {/* Society Info */}
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
-              {society.name}
-            </h3>
-            <Badge variant="secondary" className="mt-1 text-xs">
-              {society.category}
-            </Badge>
-            <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
-              {society.description}
+          <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5">
+              <Users className="h-4 w-4" />
+              {society.followerCount.toLocaleString()} followers
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5">
+              <Calendar className="h-4 w-4" />
+              {eventCount} upcoming events
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between gap-3 border-t border-border/70 pt-4">
+            <p className="text-sm text-muted-foreground">
+              {isFollowed ? "Already in your shortlist." : "Follow to keep this group in your feed."}
             </p>
-            <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
-              <Users className="h-3.5 w-3.5" />
-              <span>{society.followerCount.toLocaleString()} followers</span>
-            </div>
+            <Button
+              variant={isFollowed ? "outline" : "default"}
+              size="sm"
+              className={cn(
+                "rounded-full px-4",
+                isFollowed && "border-border hover:border-destructive hover:bg-destructive/10 hover:text-destructive"
+              )}
+              onClick={onToggleFollow}
+            >
+              {isFollowed ? "Unfollow" : "Follow"}
+            </Button>
           </div>
         </div>
-
-        {/* Unfollow Button */}
-        <Button
-          variant="outline"
-          size="sm"
-          className={cn(
-            "w-full mt-4 transition-all duration-200",
-            isFollowed
-              ? "hover:bg-destructive/10 hover:text-destructive hover:border-destructive"
-              : "bg-primary text-primary-foreground hover:bg-primary/90"
-          )}
-          onClick={() => setIsFollowed(!isFollowed)}
-        >
-          {isFollowed ? "Unfollow" : "Follow"}
-        </Button>
       </CardContent>
     </Card>
   );
