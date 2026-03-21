@@ -40,6 +40,7 @@ CREATE TABLE societies (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   logo_url TEXT,
+  instagram_url TEXT,
   category event_category NOT NULL,
   description TEXT,
   created_by UUID REFERENCES profiles(id) ON DELETE SET NULL,

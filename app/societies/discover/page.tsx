@@ -4,7 +4,6 @@ import { SocietiesControls } from "@/components/societies-controls";
 import { SocietyCard } from "@/components/society-card";
 import { useSocieties } from "@/components/societies-context";
 import { Badge } from "@/components/ui/badge";
-import { mockEvents } from "@/lib/mock-data";
 import type { Society } from "@/lib/types";
 
 export default function DiscoverSocietiesPage() {
@@ -18,6 +17,7 @@ export default function DiscoverSocietiesPage() {
     setSelectedCategory,
     sortBy,
     setSortBy,
+    eventCounts,
   } = useSocieties();
 
   const filteredSocieties = societies
@@ -80,7 +80,7 @@ export default function DiscoverSocietiesPage() {
                 society={society}
                 isFollowed={followedIds.includes(society.id)}
                 onToggleFollow={() => toggleFollow(society.id)}
-                eventCount={getSocietyEventCount(society)}
+                eventCount={eventCounts[society.id] ?? 0}
               />
             ))}
           </div>
@@ -97,6 +97,3 @@ export default function DiscoverSocietiesPage() {
   );
 }
 
-function getSocietyEventCount(society: Society) {
-  return mockEvents.filter((event) => event.society.id === society.id).length;
-}

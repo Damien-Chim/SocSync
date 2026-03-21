@@ -1,10 +1,10 @@
 "use client";
 
-import { type ReactNode } from "react";
+import { type ReactNode, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { AppShell } from "@/components/app-shell";
 import { SavedEventsProvider, useSavedEvents } from "@/components/saved-events-context";
-import { mockEvents } from "@/lib/mock-data";
+import { createClient } from "@/lib/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,14 +27,67 @@ export default function SavedEventsPage() {
   );
 }
 
+function mapDbEvent(row: Record<string, unknown>): Event {
+  return {
+    id: row.id as string,
+    title: row.title as string,
+    description: (row.description as string) ?? "",
+    society: {
+      id: row.society_id as string,
+      name: (row.society_name as string) ?? "",
+      logo: (row.society_logo as string) ?? "",
+      category: (row.society_category as Event["category"]) ?? "Tech",
+      description: "",
+      followerCount: 0,
+    },
+    date: row.date as string,
+    time: (row.time as string)?.slice(0, 5) ?? "",
+    location: (row.location as string) ?? "",
+    coordinates: { lat: 0, lng: 0 },
+    price: row.price == null ? "Free" : Number(row.price),
+    hasFreeFood: (row.has_free_food as boolean) ?? false,
+    registrationLink: (row.registration_link as string) ?? "",
+    bannerImage: (row.banner_image_url as string) ?? "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=400&fit=crop",
+    category: (row.category as Event["category"]) ?? "Tech",
+    saveCount: (row.save_count as number) ?? 0,
+  };
+}
+
 function SavedEventsContent() {
   const { savedEventIds, isSaved, toggleSave, loading } = useSavedEvents();
+  const [savedEvents, setSavedEvents] = useState<Event[]>([]);
+  const [eventsLoading, setEventsLoading] = useState(true);
+  const supabase = useMemo(() => createClient(), []);
 
-  const savedEvents = mockEvents.filter((event) => savedEventIds.includes(event.id));
+  useEffect(() => {
+    if (loading) return;
+    if (savedEventIds.length === 0) {
+      setSavedEvents([]);
+      setEventsLoading(false);
+      return;
+    }
+
+    async function fetchSavedEvents() {
+      const { data, error } = await supabase
+        .from("events_with_details")
+        .select("*")
+        .in("id", savedEventIds);
+
+      if (error) {
+        console.error("[SavedEvents] Fetch error:", error.message);
+      } else if (data) {
+        setSavedEvents(data.map(mapDbEvent));
+      }
+      setEventsLoading(false);
+    }
+
+    fetchSavedEvents();
+  }, [savedEventIds, loading, supabase]);
+
   const now = new Date();
-
   const upcomingEvents = savedEvents.filter((event) => new Date(event.date) >= now);
   const pastEvents = savedEvents.filter((event) => new Date(event.date) < now);
+  const isLoading = loading || eventsLoading;
 
   return (
     <AppShell userRole="student">
@@ -54,7 +107,7 @@ function SavedEventsContent() {
           </div>
         </section>
 
-        {loading ? (
+        {isLoading ? (
           <div className="flex items-center justify-center py-16">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
           </div>

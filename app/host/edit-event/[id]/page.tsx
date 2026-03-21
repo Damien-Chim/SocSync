@@ -17,11 +17,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Upload, MapPin, ArrowLeft, X, Loader2 } from "lucide-react";
+import { Upload, ArrowLeft, X, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { EVENT_CATEGORIES, type EventCategory } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
+import { LocationAutocomplete } from "@/components/location-autocomplete";
 
 export default function EditEventPage() {
   const router = useRouter();
@@ -44,6 +45,8 @@ export default function EditEventPage() {
     startTime: "",
     endTime: "",
     location: "",
+    latitude: null as number | null,
+    longitude: null as number | null,
     price: "",
     isFree: true,
     hasFreeFood: false,
@@ -74,6 +77,8 @@ export default function EditEventPage() {
         startTime: event.time?.slice(0, 5) ?? "",
         endTime: event.end_time?.slice(0, 5) ?? "",
         location: event.location ?? "",
+        latitude: event.latitude ?? null,
+        longitude: event.longitude ?? null,
         price: event.price != null ? String(event.price) : "",
         isFree: event.price == null,
         hasFreeFood: event.has_free_food ?? false,
@@ -151,6 +156,8 @@ export default function EditEventPage() {
         time: formData.startTime,
         end_time: formData.endTime || null,
         location: formData.location,
+        latitude: formData.latitude,
+        longitude: formData.longitude,
         price: formData.isFree ? null : parseFloat(formData.price) || null,
         has_free_food: formData.hasFreeFood,
         registration_link: formData.registrationLink,
@@ -351,18 +358,20 @@ export default function EditEventPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="location">Location</Label>
-                <div className="relative">
-                  <Input
-                    id="location"
-                    placeholder="e.g., Engineering Building, Room 101"
-                    value={formData.location}
-                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                    required
-                    className="h-11 pr-10"
-                  />
-                  <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                </div>
+                <Label>Location</Label>
+                <LocationAutocomplete
+                  value={formData.location}
+                  onChange={(location, lat, lng) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      location,
+                      latitude: lat ?? prev.latitude,
+                      longitude: lng ?? prev.longitude,
+                    }))
+                  }
+                  required
+                  placeholder="Search for a venue or address..."
+                />
               </div>
 
               <div className="space-y-4">

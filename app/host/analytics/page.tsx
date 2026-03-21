@@ -1,7 +1,7 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/app-shell";
-import { mockEvents, mockSocieties } from "@/lib/mock-data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
@@ -10,44 +10,77 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-import { useState } from "react";
+import { Loader2 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
-const followerData = [
-  { month: "Jan", followers: 980 },
-  { month: "Feb", followers: 1050 },
-  { month: "Mar", followers: 1120 },
-  { month: "Apr", followers: 1234 },
-];
-
-const viewsData = [
-  { week: "Week 1", views: 450 },
-  { week: "Week 2", views: 680 },
-  { week: "Week 3", views: 520 },
-  { week: "Week 4", views: 890 },
-];
+interface AnalyticsEvent {
+  id: string;
+  title: string;
+  save_count: number;
+  registration_count: number;
+}
 
 export default function AnalyticsPage() {
-  const society = mockSocieties[0];
-  const hostEvents = mockEvents.filter((e) => e.society.id === society.id);
-  const [selectedEvent, setSelectedEvent] = useState(hostEvents[0]?.id || "");
+  const [events, setEvents] = useState<AnalyticsEvent[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState("");
+  const [followerCount, setFollowerCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const supabase = useMemo(() => createClient(), []);
 
-  const selectedEventData = hostEvents.find((e) => e.id === selectedEvent);
+  useEffect(() => {
+    async function load() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { setLoading(false); return; }
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("society_id")
+        .eq("id", user.id)
+        .single();
+
+      if (!profile?.society_id) { setLoading(false); return; }
+
+      const [eventsResult, followsResult] = await Promise.all([
+        supabase
+          .from("events_with_details")
+          .select("id, title, save_count, registration_count")
+          .eq("society_id", profile.society_id)
+          .order("date", { ascending: false }),
+        supabase
+          .from("society_follows")
+          .select("id", { count: "exact", head: true })
+          .eq("society_id", profile.society_id),
+      ]);
+
+      if (eventsResult.data) {
+        setEvents(eventsResult.data);
+        if (eventsResult.data.length > 0) {
+          setSelectedEvent(eventsResult.data[0].id);
+        }
+      }
+      setFollowerCount(followsResult.count ?? 0);
+      setLoading(false);
+    }
+    load();
+  }, [supabase]);
+
+  const selectedEventData = events.find((e) => e.id === selectedEvent);
+  const totalSaves = events.reduce((sum, e) => sum + (e.save_count ?? 0), 0);
+  const totalRegistrations = events.reduce((sum, e) => sum + (e.registration_count ?? 0), 0);
+
+  if (loading) {
+    return (
+      <AppShell userRole="host">
+        <div className="flex items-center justify-center py-24">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell userRole="host">
       <div className="space-y-6">
-        {/* Page Header */}
         <div>
           <h1 className="text-2xl font-bold text-foreground">Analytics</h1>
           <p className="text-muted-foreground mt-1">
@@ -55,86 +88,13 @@ export default function AnalyticsPage() {
           </p>
         </div>
 
-        {/* Overview Charts */}
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* Followers Over Time */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Followers Growth</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[250px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={followerData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis
-                      dataKey="month"
-                      stroke="hsl(var(--muted-foreground))"
-                      fontSize={12}
-                    />
-                    <YAxis
-                      stroke="hsl(var(--muted-foreground))"
-                      fontSize={12}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "hsl(var(--card))",
-                        border: "1px solid hsl(var(--border))",
-                        borderRadius: "8px",
-                      }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="followers"
-                      stroke="hsl(var(--primary))"
-                      strokeWidth={3}
-                      dot={{ fill: "hsl(var(--primary))", strokeWidth: 2 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Profile Views */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Profile Views (Last 4 Weeks)</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[250px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={viewsData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis
-                      dataKey="week"
-                      stroke="hsl(var(--muted-foreground))"
-                      fontSize={12}
-                    />
-                    <YAxis
-                      stroke="hsl(var(--muted-foreground))"
-                      fontSize={12}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "hsl(var(--card))",
-                        border: "1px solid hsl(var(--border))",
-                        borderRadius: "8px",
-                      }}
-                    />
-                    <Bar
-                      dataKey="views"
-                      fill="hsl(var(--accent))"
-                      radius={[4, 4, 0, 0]}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <SummaryCard label="Total Events" value={events.length} />
+          <SummaryCard label="Total Saves" value={totalSaves} />
+          <SummaryCard label="Total Registrations" value={totalRegistrations} />
+          <SummaryCard label="Followers" value={followerCount} />
         </div>
 
-        {/* Per-Event Analytics */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-base">Event Analytics</CardTitle>
@@ -143,7 +103,7 @@ export default function AnalyticsPage() {
                 <SelectValue placeholder="Select an event" />
               </SelectTrigger>
               <SelectContent>
-                {hostEvents.map((event) => (
+                {events.map((event) => (
                   <SelectItem key={event.id} value={event.id}>
                     {event.title}
                   </SelectItem>
@@ -153,34 +113,39 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             {selectedEventData ? (
-              <div className="grid gap-6 sm:grid-cols-3">
+              <div className="grid gap-6 sm:grid-cols-2">
                 <div className="p-4 rounded-xl bg-primary/5 border border-primary/20">
-                  <p className="text-sm text-muted-foreground">Total Saves</p>
+                  <p className="text-sm text-muted-foreground">Saves</p>
                   <p className="text-3xl font-bold text-primary mt-1">
-                    {selectedEventData.saveCount}
-                  </p>
-                </div>
-                <div className="p-4 rounded-xl bg-accent/10 border border-accent/20">
-                  <p className="text-sm text-muted-foreground">Page Views</p>
-                  <p className="text-3xl font-bold text-accent-foreground mt-1">
-                    {Math.round(selectedEventData.saveCount * 3.2)}
+                    {selectedEventData.save_count ?? 0}
                   </p>
                 </div>
                 <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                  <p className="text-sm text-muted-foreground">Conversion Rate</p>
+                  <p className="text-sm text-muted-foreground">Registrations</p>
                   <p className="text-3xl font-bold text-emerald-600 mt-1">
-                    31.2%
+                    {selectedEventData.registration_count ?? 0}
                   </p>
                 </div>
               </div>
             ) : (
               <p className="text-muted-foreground text-center py-8">
-                Select an event to view analytics
+                {events.length === 0 ? "No events created yet." : "Select an event to view analytics"}
               </p>
             )}
           </CardContent>
         </Card>
       </div>
     </AppShell>
+  );
+}
+
+function SummaryCard({ label, value }: { label: string; value: number }) {
+  return (
+    <Card>
+      <CardContent className="p-5">
+        <p className="text-sm text-muted-foreground">{label}</p>
+        <p className="text-2xl font-bold text-foreground mt-1">{value.toLocaleString()}</p>
+      </CardContent>
+    </Card>
   );
 }

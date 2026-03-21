@@ -4,7 +4,6 @@ import { SocietiesControls } from "@/components/societies-controls";
 import { SocietyCard } from "@/components/society-card";
 import { useSocieties } from "@/components/societies-context";
 import { Badge } from "@/components/ui/badge";
-import { mockEvents } from "@/lib/mock-data";
 import type { Society } from "@/lib/types";
 import { Heart } from "lucide-react";
 
@@ -16,6 +15,7 @@ export default function LikedSocietiesPage() {
     searchQuery,
     selectedCategory,
     sortBy,
+    eventCounts,
   } = useSocieties();
 
   const likedSocieties = societies
@@ -82,7 +82,7 @@ export default function LikedSocietiesPage() {
             society={society}
             isFollowed
             onToggleFollow={() => toggleFollow(society.id)}
-            eventCount={getSocietyEventCount(society)}
+            eventCount={eventCounts[society.id] ?? 0}
           />
         ))}
       </div>
@@ -104,6 +104,3 @@ export default function LikedSocietiesPage() {
   );
 }
 
-function getSocietyEventCount(society: Society) {
-  return mockEvents.filter((event) => event.society.id === society.id).length;
-}

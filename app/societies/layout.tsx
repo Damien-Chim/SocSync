@@ -7,7 +7,6 @@ import { SocietyCard } from "@/components/society-card";
 import { useSocieties } from "@/components/societies-context";
 import { Badge } from "@/components/ui/badge";
 import { SocietiesProvider } from "@/components/societies-context";
-import { mockEvents } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 import type { Society } from "@/lib/types";
 
@@ -28,7 +27,7 @@ function SocietiesLayoutContent({
 }: {
   children: ReactNode;
 }) {
-  const { societies, followedIds, toggleFollow } = useSocieties();
+  const { societies, followedIds, toggleFollow, eventCounts } = useSocieties();
   const followedSocieties = societies.filter((society) => followedIds.includes(society.id));
   const preferredCategories = new Set(followedSocieties.map((society) => society.category));
   const recommendedSocieties = societies.filter(
@@ -73,6 +72,7 @@ function SocietiesLayoutContent({
               isFollowed={followedIds.includes(featuredSociety.id)}
               onToggleFollow={() => toggleFollow(featuredSociety.id)}
               reason={recommendationReason}
+              eventCount={eventCounts[featuredSociety.id] ?? 0}
             />
 
             <div className="rounded-[1.75rem] border border-border/60 bg-card p-5 shadow-sm">
@@ -112,11 +112,13 @@ function FeaturedSocietyCard({
   isFollowed,
   onToggleFollow,
   reason,
+  eventCount,
 }: {
   society: Society;
   isFollowed: boolean;
   onToggleFollow: () => void;
   reason: string;
+  eventCount: number;
 }) {
   return (
     <div className="rounded-[1.9rem] border border-border/60 bg-[linear-gradient(145deg,rgba(255,255,255,0.98),rgba(247,244,255,0.94))] p-6 shadow-[0_18px_60px_rgba(24,24,27,0.08)]">
@@ -141,7 +143,7 @@ function FeaturedSocietyCard({
 
       <div className="mt-6 flex flex-wrap gap-3 text-sm text-muted-foreground">
         <span>{society.followerCount.toLocaleString()} followers</span>
-        <span>{getSocietyEventCount(society)} upcoming events</span>
+        <span>{eventCount} upcoming events</span>
       </div>
 
       <div className="mt-6">
@@ -149,7 +151,7 @@ function FeaturedSocietyCard({
           society={society}
           isFollowed={isFollowed}
           onToggleFollow={onToggleFollow}
-          eventCount={getSocietyEventCount(society)}
+          eventCount={eventCount}
           compact
         />
       </div>
@@ -189,6 +191,3 @@ function CompactSocietyRow({
   );
 }
 
-function getSocietyEventCount(society: Society) {
-  return mockEvents.filter((event) => event.society.id === society.id).length;
-}

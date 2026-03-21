@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { EventCard } from "@/components/event-card";
 import { SavedEventsProvider, useSavedEvents } from "@/components/saved-events-context";
@@ -9,19 +9,17 @@ import { FilterBar } from "@/components/filter-bar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { mockEvents } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 import type { Event, EventCategory } from "@/lib/types";
+import { createClient } from "@/lib/supabase/client";
 import {
   ArrowUpRight,
   Bookmark,
   Calendar,
   Clock,
-  Flame,
+  Loader2,
   MapPin,
   Search,
-  Sparkles,
 } from "lucide-react";
 
 export default function DashboardPage() {
@@ -32,46 +30,64 @@ export default function DashboardPage() {
   );
 }
 
+function mapDbEventToEvent(row: Record<string, unknown>): Event {
+  return {
+    id: row.id as string,
+    title: row.title as string,
+    description: (row.description as string) ?? "",
+    society: {
+      id: row.society_id as string,
+      name: (row.society_name as string) ?? "",
+      logo: (row.society_logo as string) ?? "",
+      category: (row.society_category as EventCategory) ?? "Tech",
+      description: "",
+      followerCount: 0,
+    },
+    date: row.date as string,
+    time: (row.time as string)?.slice(0, 5) ?? "",
+    location: (row.location as string) ?? "",
+    coordinates: {
+      lat: (row.latitude as number) ?? 0,
+      lng: (row.longitude as number) ?? 0,
+    },
+    price: row.price == null ? "Free" : Number(row.price),
+    hasFreeFood: (row.has_free_food as boolean) ?? false,
+    registrationLink: (row.registration_link as string) ?? "",
+    bannerImage: (row.banner_image_url as string) ?? "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=400&fit=crop",
+    category: (row.category as EventCategory) ?? "Tech",
+    saveCount: (row.save_count as number) ?? 0,
+  };
+}
+
 function DashboardContent() {
-  const searchRef = useRef<HTMLDivElement>(null);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [allEvents, setAllEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedCategories, setSelectedCategories] = useState<EventCategory[]>([]);
   const [freeFoodOnly, setFreeFoodOnly] = useState(false);
   const [freeEventsOnly, setFreeEventsOnly] = useState(false);
 
+  const supabase = useMemo(() => createClient(), []);
+
   useEffect(() => {
-    if (!isSearchOpen) {
-      return;
+    async function loadEvents() {
+      const { data, error } = await supabase
+        .from("events_with_details")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("[Dashboard] Failed to load events:", error.message);
+      } else if (data) {
+        setAllEvents(data.map(mapDbEventToEvent));
+      }
+      setLoading(false);
     }
 
-    const handlePointerDown = (event: MouseEvent) => {
-      if (!searchRef.current?.contains(event.target as Node)) {
-        setIsSearchOpen(false);
-        setSearchQuery("");
-      }
-    };
-
-    document.addEventListener("mousedown", handlePointerDown);
-    return () => document.removeEventListener("mousedown", handlePointerDown);
-  }, [isSearchOpen]);
+    loadEvents();
+  }, [supabase]);
 
   const filteredEvents = useMemo(() => {
-    const normalizedQuery = searchQuery.trim().toLowerCase();
-
-    return mockEvents.filter((event) => {
-      if (normalizedQuery) {
-        const matchesSearch =
-          event.title.toLowerCase().includes(normalizedQuery) ||
-          event.society.name.toLowerCase().includes(normalizedQuery) ||
-          event.location.toLowerCase().includes(normalizedQuery) ||
-          event.category.toLowerCase().includes(normalizedQuery);
-
-        if (!matchesSearch) {
-          return false;
-        }
-      }
-
+    return allEvents.filter((event) => {
       if (selectedCategories.length > 0 && !selectedCategories.includes(event.category)) {
         return false;
       }
@@ -83,15 +99,23 @@ function DashboardContent() {
       }
       return true;
     });
-  }, [searchQuery, selectedCategories, freeFoodOnly, freeEventsOnly]);
+  }, [allEvents, selectedCategories, freeFoodOnly, freeEventsOnly]);
 
   const featuredEvent = filteredEvents[0];
   const freeAndEasyEvents = filteredEvents
-    .filter((event) => event.price === "Free" || event.hasFreeFood)
+    .filter((event) => event.price === "Free")
     .slice(0, 3);
   const allUpcomingEvents = filteredEvents.slice(featuredEvent ? 1 : 0);
-  const eventCountLabel = `${filteredEvents.length} event${filteredEvents.length === 1 ? "" : "s"}`;
-  const freeCount = filteredEvents.filter((event) => event.price === "Free").length;
+
+  if (loading) {
+    return (
+      <AppShell userRole="student">
+        <div className="flex items-center justify-center py-24">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell userRole="student">
@@ -108,57 +132,9 @@ function DashboardContent() {
                     <h1 className="max-w-xl text-4xl font-semibold tracking-[-0.04em] text-foreground sm:text-5xl">
                       What&apos;s worth leaving your room for.
                     </h1>
-                    {/* <p className="max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
-                      Workshops, socials, career nights, and low-effort wins with actual student energy.
-                    </p> */}
                   </div>
                 </div>
-
-                {/* <div ref={searchRef} className="flex items-center gap-3">
-                  {isSearchOpen && (
-                    <div className="w-[15rem] sm:w-[18rem]">
-                      <Input
-                        value={searchQuery}
-                        onChange={(event) => setSearchQuery(event.target.value)}
-                        placeholder="Search events"
-                        className="h-11 rounded-full border-border/70 bg-white/90 px-4 shadow-sm"
-                        autoFocus
-                      />
-                    </div>
-                  )}
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    aria-label="Open search"
-                    className="rounded-full border border-border/70 bg-white/85 shadow-sm"
-                    onClick={() => setIsSearchOpen((open) => !open)}
-                  >
-                    <Search className="h-4 w-4" />
-                  </Button>
-                </div> */}
               </div>
-
-              {/* <div className="grid gap-3 sm:grid-cols-3">
-                <MetricCard
-                  icon={<Sparkles className="h-4 w-4" />}
-                  label="Showing now"
-                  value={eventCountLabel}
-                  detail={selectedCategories.length > 0 ? "Based on your filters" : "Across all categories"}
-                />
-                <MetricCard
-                  icon={<Flame className="h-4 w-4" />}
-                  label="Free to join"
-                  value={`${freeCount}`}
-                  detail="No tickets required"
-                />
-                <MetricCard
-                  icon={<Calendar className="h-4 w-4" />}
-                  label="Saved by you"
-                  value={`${mockUser.savedEvents.length}`}
-                  detail="Ready when you are"
-                />
-              </div> */}
             </div>
 
             <div className="rounded-[1.6rem] border border-border/60 bg-white/70 p-4 backdrop-blur-sm">
@@ -198,9 +174,10 @@ function DashboardContent() {
                       className="object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-transparent" />
+                    <FeaturedBookmark eventId={featuredEvent.id} />
                     <div className="absolute inset-x-0 top-0 flex items-center justify-between p-5">
                       <Badge className="rounded-full bg-white/15 text-white backdrop-blur-sm hover:bg-white/20">
-                        Featured this week
+                        Latest event
                       </Badge>
                       <Badge className="rounded-full bg-black/30 text-white backdrop-blur-sm hover:bg-black/40">
                         {featuredEvent.category}
@@ -268,12 +245,14 @@ function DashboardContent() {
                       </div>
                     </div>
 
-                    <Button asChild className="mt-6 h-11 rounded-full px-5">
-                      <a href={featuredEvent.registrationLink} target="_blank" rel="noopener noreferrer">
-                        Open event
-                        <ArrowUpRight className="ml-2 h-4 w-4" />
-                      </a>
-                    </Button>
+                    {featuredEvent.registrationLink && (
+                      <Button asChild className="mt-6 h-11 rounded-full px-5">
+                        <a href={featuredEvent.registrationLink} target="_blank" rel="noopener noreferrer">
+                          Open event
+                          <ArrowUpRight className="ml-2 h-4 w-4" />
+                        </a>
+                      </Button>
+                    )}
                   </CardContent>
                 </div>
               </Card>
@@ -292,10 +271,7 @@ function DashboardContent() {
                   <div className="space-y-3">
                     {freeAndEasyEvents.length > 0 ? (
                       freeAndEasyEvents.map((event) => (
-                        <CompactEventRow
-                          key={event.id}
-                          event={event}
-                        />
+                        <CompactEventRow key={event.id} event={event} />
                       ))
                     ) : (
                       <p className="rounded-2xl border border-dashed border-border px-4 py-8 text-sm text-muted-foreground">
@@ -317,19 +293,13 @@ function DashboardContent() {
                     Everything else worth scanning.
                   </h2>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  A denser view so the page feels like a real event board, not a template gallery.
-                </p>
               </div>
 
               {allUpcomingEvents.length > 0 ? (
                 <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
                   <div className="grid gap-6 sm:grid-cols-2">
                     {allUpcomingEvents.slice(0, 4).map((event) => (
-                      <EventCard
-                        key={event.id}
-                        event={event}
-                      />
+                      <EventCard key={event.id} event={event} />
                     ))}
                   </div>
 
@@ -367,29 +337,6 @@ function DashboardContent() {
         )}
       </div>
     </AppShell>
-  );
-}
-
-function MetricCard({
-  icon,
-  label,
-  value,
-  detail,
-}: {
-  icon: ReactNode;
-  label: string;
-  value: string;
-  detail: string;
-}) {
-  return (
-    <div className="rounded-[1.4rem] border border-white/70 bg-white/75 p-4 shadow-sm backdrop-blur-sm">
-      <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-full bg-foreground text-background">
-        {icon}
-      </div>
-      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{label}</p>
-      <p className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-foreground">{value}</p>
-      <p className="mt-1 text-sm text-muted-foreground">{detail}</p>
-    </div>
   );
 }
 
@@ -460,6 +407,25 @@ function ListEventRow({ event }: { event: Event }) {
         {event.category}
       </Badge>
     </div>
+  );
+}
+
+function FeaturedBookmark({ eventId }: { eventId: string }) {
+  const { isSaved, toggleSave } = useSavedEvents();
+  const saved = isSaved(eventId);
+
+  return (
+    <button
+      onClick={() => toggleSave(eventId)}
+      className={cn(
+        "absolute top-5 right-5 z-10 flex h-10 w-10 items-center justify-center rounded-full transition-all duration-200",
+        saved
+          ? "bg-primary text-primary-foreground"
+          : "bg-white/20 text-white backdrop-blur-sm hover:bg-white/30"
+      )}
+    >
+      <Bookmark className={cn("h-5 w-5", saved && "fill-current")} />
+    </button>
   );
 }
 

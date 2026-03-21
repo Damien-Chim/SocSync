@@ -29,6 +29,7 @@ export default function SignupPage() {
     email: "",
     password: "",
     societyName: "",
+    instagramLink: "",
   });
 
   const handleFileSelect = useCallback((file: File) => {
@@ -92,31 +93,42 @@ export default function SignupPage() {
       return;
     }
 
-    if (role === "host" && logoFile) {
-      const ext = logoFile.name.split(".").pop() ?? "png";
-      const filePath = `society-logos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    if (role === "host") {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("society_id")
+        .eq("id", data.user!.id)
+        .single();
 
-      const { error: uploadError } = await supabase.storage
-        .from("SocSync Pics")
-        .upload(filePath, logoFile, { contentType: logoFile.type });
+      if (profile?.society_id) {
+        const updates: Record<string, string> = {};
 
-      if (uploadError) {
-        console.error("[Signup] Logo upload error:", uploadError.message);
-      } else {
-        const { data: urlData } = supabase.storage
-          .from("SocSync Pics")
-          .getPublicUrl(filePath);
+        if (logoFile) {
+          const ext = logoFile.name.split(".").pop() ?? "png";
+          const filePath = `society-logos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("society_id")
-          .eq("id", data.user!.id)
-          .single();
+          const { error: uploadError } = await supabase.storage
+            .from("SocSync Pics")
+            .upload(filePath, logoFile, { contentType: logoFile.type });
 
-        if (profile?.society_id) {
+          if (uploadError) {
+            console.error("[Signup] Logo upload error:", uploadError.message);
+          } else {
+            const { data: urlData } = supabase.storage
+              .from("SocSync Pics")
+              .getPublicUrl(filePath);
+            updates.logo_url = urlData.publicUrl;
+          }
+        }
+
+        if (formData.instagramLink.trim()) {
+          updates.instagram_url = formData.instagramLink.trim();
+        }
+
+        if (Object.keys(updates).length > 0) {
           await supabase
             .from("societies")
-            .update({ logo_url: urlData.publicUrl })
+            .update(updates)
             .eq("id", profile.society_id);
         }
       }
@@ -272,6 +284,18 @@ export default function SignupPage() {
                         </div>
                       </div>
                     )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="instagramLink">Instagram Link</Label>
+                    <Input
+                      id="instagramLink"
+                      type="url"
+                      placeholder="https://instagram.com/yoursociety"
+                      value={formData.instagramLink}
+                      onChange={(e) => setFormData({ ...formData, instagramLink: e.target.value })}
+                      className="h-11"
+                    />
                   </div>
                 </>
               )}

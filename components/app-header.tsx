@@ -9,19 +9,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { mockNotifications } from "@/lib/mock-data";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 
 export function AppHeader() {
-  const [notifications, setNotifications] = useState(mockNotifications);
+  const [notifications, setNotifications] = useState<
+    { id: string; message: string; read: boolean; created_at: string; society_name?: string }[]
+  >([]);
   const [displayName, setDisplayName] = useState("there");
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   useEffect(() => {
     const supabase = createClient();
 
-    const loadUser = async () => {
+    const loadData = async () => {
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -31,17 +32,39 @@ export function AppHeader() {
         (user?.user_metadata?.full_name as string | undefined);
 
       const fallbackFromEmail = user?.email?.split("@")[0];
-
       setDisplayName(nameFromMetadata || fallbackFromEmail || "there");
+
+      if (user) {
+        const { data, error } = await supabase
+          .from("notifications")
+          .select("id, message, read, created_at, societies(name)")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(10);
+
+        if (!error && data) {
+          setNotifications(
+            data.map((n: Record<string, unknown>) => ({
+              id: n.id as string,
+              message: (n.message as string) ?? "",
+              read: (n.read as boolean) ?? false,
+              created_at: n.created_at as string,
+              society_name: (n.societies as Record<string, unknown> | null)?.name as string | undefined,
+            }))
+          );
+        }
+      }
     };
 
-    void loadUser();
+    void loadData();
   }, []);
 
-  const markAsRead = (id: string) => {
+  const markAsRead = async (id: string) => {
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, read: true } : n))
     );
+    const supabase = createClient();
+    await supabase.from("notifications").update({ read: true }).eq("id", id);
   };
 
   return (
@@ -84,14 +107,14 @@ export function AppHeader() {
                       <span className="h-2 w-2 rounded-full bg-accent flex-shrink-0" />
                     )}
                     <span className="font-medium text-sm truncate">
-                      {notification.societyName}
+                      {notification.society_name ?? "Society"}
                     </span>
                     <span className="text-xs text-muted-foreground ml-auto">
-                      {notification.timestamp}
+                      {new Date(notification.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground pl-4 truncate w-full">
-                    New event: {notification.eventTitle}
+                    {notification.message}
                   </p>
                 </DropdownMenuItem>
               ))

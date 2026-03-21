@@ -9,7 +9,6 @@ import {
   useEffect,
   useCallback,
 } from "react";
-import { mockSocieties } from "@/lib/mock-data";
 import { EVENT_CATEGORIES, type EventCategory, type Society } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client";
 
@@ -28,12 +27,14 @@ interface SocietiesContextValue {
   followedCount: number;
   categoryCount: number;
   loading: boolean;
+  eventCounts: Record<string, number>;
 }
 
 const SocietiesContext = createContext<SocietiesContextValue | null>(null);
 
 export function SocietiesProvider({ children }: { children: ReactNode }) {
-  const [societies, setSocieties] = useState<Society[]>(mockSocieties);
+  const [societies, setSocieties] = useState<Society[]>([]);
+  const [eventCounts, setEventCounts] = useState<Record<string, number>>({});
   const [followedIds, setFollowedIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
@@ -63,6 +64,11 @@ export function SocietiesProvider({ children }: { children: ReactNode }) {
             followerCount: s.follower_count ?? 0,
           }))
         );
+        const counts: Record<string, number> = {};
+        for (const s of dbSocieties) {
+          counts[s.id] = s.event_count ?? 0;
+        }
+        setEventCounts(counts);
       }
 
       // Fetch follows for logged-in user
@@ -159,8 +165,9 @@ export function SocietiesProvider({ children }: { children: ReactNode }) {
       followedCount: followedIds.length,
       categoryCount: EVENT_CATEGORIES.length,
       loading,
+      eventCounts,
     }),
-    [societies, followedIds, toggleFollow, searchQuery, selectedCategory, sortBy, loading]
+    [societies, followedIds, toggleFollow, searchQuery, selectedCategory, sortBy, loading, eventCounts]
   );
 
   return <SocietiesContext.Provider value={value}>{children}</SocietiesContext.Provider>;

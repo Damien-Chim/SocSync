@@ -30,6 +30,8 @@ const mapContainerStyle = {
   borderRadius: "0.75rem",
 };
 
+const libraries: ("places")[] = ["places"];
+
 const center = { lat: 51.5074, lng: -0.1278 };
 
 const mapOptions: google.maps.MapOptions = {
@@ -64,6 +66,7 @@ export function EventMap({ events }: EventMapProps) {
 
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "",
+    libraries,
   });
 
   const onLoad = useCallback((map: google.maps.Map) => {
