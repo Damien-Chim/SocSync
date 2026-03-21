@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Bell, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,11 +10,33 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { mockNotifications } from "@/lib/mock-data";
+import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 
 export function AppHeader() {
   const [notifications, setNotifications] = useState(mockNotifications);
+  const [displayName, setDisplayName] = useState("there");
   const unreadCount = notifications.filter((n) => !n.read).length;
+
+  useEffect(() => {
+    const supabase = createClient();
+
+    const loadUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      const nameFromMetadata =
+        (user?.user_metadata?.name as string | undefined) ||
+        (user?.user_metadata?.full_name as string | undefined);
+
+      const fallbackFromEmail = user?.email?.split("@")[0];
+
+      setDisplayName(nameFromMetadata || fallbackFromEmail || "there");
+    };
+
+    void loadUser();
+  }, []);
 
   const markAsRead = (id: string) => {
     setNotifications((prev) =>
@@ -25,7 +47,7 @@ export function AppHeader() {
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-6">
       <div>
-        <h1 className="text-3xl font-semibold text-foreground">Hi, xxx !</h1>
+        <h1 className="text-3xl font-semibold text-foreground">Hi, {displayName} !</h1>
       </div>
 
       <div className="flex items-center gap-3">
