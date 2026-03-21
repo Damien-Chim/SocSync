@@ -58,7 +58,7 @@ export default function LikedSocietiesPage() {
 
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">
+          <h2 className="text-2xl px-4 font-semibold uppercase tracking-[-0.03em] text-foreground">
             Following
           </h2>
         </div>

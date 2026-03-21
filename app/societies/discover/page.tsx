@@ -55,16 +55,13 @@ export default function DiscoverSocietiesPage() {
 
   return (
     <div className="space-y-6">
-      <section className="space-y-4">
+      <section className="space-y-6">
         <SocietiesControls />
 
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              All societies
-            </p>
-            <h2 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">
-              Browse the full directory.
+            <h2 className="text-2xl px-4 font-semibold uppercase tracking-[-0.03em] text-foreground">
+              All Societies
             </h2>
           </div>
         </div>

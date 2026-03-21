@@ -26,12 +26,12 @@ export function SocietyCard({
   return (
     <Card
       className={cn(
-        "group overflow-hidden border border-border/70 bg-card shadow-[0_12px_35px_rgba(24,24,27,0.05)] transition-all duration-300 hover:-translate-y-0.5 hover:border-foreground/20 hover:shadow-[0_18px_45px_rgba(24,24,27,0.08)]",
+        "group h-full overflow-hidden border border-border/70 bg-card shadow-[0_12px_35px_rgba(24,24,27,0.05)] transition-all duration-300 hover:-translate-y-0.5 hover:border-foreground/20 hover:shadow-[0_18px_45px_rgba(24,24,27,0.08)]",
         compact && "shadow-none"
       )}
     >
-      <CardContent className={cn("p-5", compact && "p-0")}>
-        <div className={cn("flex flex-col gap-5", compact && "gap-4")}>
+      <CardContent className={cn("h-full p-5", compact && "p-0")}>
+        <div className={cn("flex h-full flex-col gap-5", compact && "gap-4")}>
           <div className="flex items-start justify-between gap-4">
             <div className="flex min-w-0 items-start gap-4">
               <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-[1.1rem] bg-muted">
@@ -44,7 +44,7 @@ export function SocietyCard({
                 />
               </div>
 
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className="truncate text-xl font-semibold tracking-[-0.02em] text-foreground">
                     {society.name}
@@ -53,7 +53,7 @@ export function SocietyCard({
                     {society.category}
                   </Badge>
                 </div>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                <p className="mt-2 line-clamp-2 min-h-12 text-sm leading-6 text-muted-foreground">
                   {society.description}
                 </p>
               </div>
@@ -72,8 +72,8 @@ export function SocietyCard({
             </span>
           </div>
 
-          <div className="flex items-center justify-between gap-3 border-t border-border/70 pt-4">
-            <p className="text-sm text-muted-foreground">
+          <div className="mt-auto flex items-center justify-between gap-3 border-t border-border/70 pt-4">
+            <p className="line-clamp-2 text-sm text-muted-foreground">
               {isFollowed ? "Already in your shortlist." : "Follow to keep this group in your feed."}
             </p>
             <Button
