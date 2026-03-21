@@ -45,7 +45,7 @@ export const mockSocieties: Society[] = [
 
 export const mockEvents: Event[] = [
   {
-    id: '1',
+    id: 'e1a2b3c4-0001-4000-8000-000000000001',
     title: 'AI Workshop: Build Your First Chatbot',
     description: 'Learn to build a chatbot using the latest AI technologies. Perfect for beginners!',
     society: mockSocieties[0],
@@ -61,7 +61,7 @@ export const mockEvents: Event[] = [
     saveCount: 156,
   },
   {
-    id: '2',
+    id: 'e1a2b3c4-0002-4000-8000-000000000002',
     title: 'Stock Trading Masterclass',
     description: 'Master the basics of stock trading with our expert panel.',
     society: mockSocieties[1],
@@ -77,7 +77,7 @@ export const mockEvents: Event[] = [
     saveCount: 89,
   },
   {
-    id: '3',
+    id: 'e1a2b3c4-0003-4000-8000-000000000003',
     title: 'Industry Networking Night',
     description: 'Connect with professionals from top companies in tech, finance, and consulting.',
     society: mockSocieties[2],
@@ -93,7 +93,7 @@ export const mockEvents: Event[] = [
     saveCount: 234,
   },
   {
-    id: '4',
+    id: 'e1a2b3c4-0004-4000-8000-000000000004',
     title: 'Spring Ball 2026',
     description: 'The biggest social event of the year. Dress to impress!',
     society: mockSocieties[3],
@@ -109,7 +109,7 @@ export const mockEvents: Event[] = [
     saveCount: 567,
   },
   {
-    id: '5',
+    id: 'e1a2b3c4-0005-4000-8000-000000000005',
     title: 'Hackathon: 24 Hours of Innovation',
     description: 'Join teams and build something amazing in 24 hours. Prizes worth over $5000!',
     society: mockSocieties[0],
@@ -125,7 +125,7 @@ export const mockEvents: Event[] = [
     saveCount: 321,
   },
   {
-    id: '6',
+    id: 'e1a2b3c4-0006-4000-8000-000000000006',
     title: 'Career Fair: Meet Your Future Employer',
     description: 'Over 50 companies looking to hire fresh talent. Bring your CV!',
     society: mockSocieties[4],
@@ -141,7 +141,7 @@ export const mockEvents: Event[] = [
     saveCount: 445,
   },
   {
-    id: '7',
+    id: 'e1a2b3c4-0007-4000-8000-000000000007',
     title: 'Startup Pitch Showcase',
     description: 'Watch student founders pitch live and get feedback from investors and alumni judges.',
     society: mockSocieties[2],
@@ -157,7 +157,7 @@ export const mockEvents: Event[] = [
     saveCount: 198,
   },
   {
-    id: '8',
+    id: 'e1a2b3c4-0008-4000-8000-000000000008',
     title: 'Design Jam: Rapid UX Challenge',
     description: 'Form a team, solve a real product brief, and present your prototype by the end of the night.',
     society: mockSocieties[0],
@@ -173,7 +173,7 @@ export const mockEvents: Event[] = [
     saveCount: 174,
   },
   {
-    id: '9',
+    id: 'e1a2b3c4-0009-4000-8000-000000000009',
     title: 'Cultural Night Market',
     description: 'Food stalls, performances, and student-run booths celebrating campus communities.',
     society: mockSocieties[3],
@@ -220,7 +220,7 @@ export const mockUser: User = {
   name: 'Alex Johnson',
   role: 'student',
   likedSocieties: ['a1b2c3d4-0001-4000-8000-000000000001', 'a1b2c3d4-0003-4000-8000-000000000003', 'a1b2c3d4-0004-4000-8000-000000000004'],
-  savedEvents: ['1', '3', '5'],
+  savedEvents: ['e1a2b3c4-0001-4000-8000-000000000001', 'e1a2b3c4-0003-4000-8000-000000000003', 'e1a2b3c4-0005-4000-8000-000000000005'],
 };
 
 export const mockHostUser: User = {

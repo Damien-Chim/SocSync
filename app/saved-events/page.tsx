@@ -1,30 +1,40 @@
 "use client";
 
-import { type ReactNode, useState } from "react";
+import { type ReactNode } from "react";
 import Image from "next/image";
 import { AppShell } from "@/components/app-shell";
-import { mockEvents, mockUser } from "@/lib/mock-data";
+import { SavedEventsProvider, useSavedEvents } from "@/components/saved-events-context";
+import { mockEvents } from "@/lib/mock-data";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import type { Event } from "@/lib/types";
 import {
   ArrowUpRight,
   Bookmark,
   Calendar,
   Clock,
   MapPin,
-  Sparkles,
 } from "lucide-react";
 
 export default function SavedEventsPage() {
-  const savedEvents = mockEvents.filter((event) => mockUser.savedEvents.includes(event.id));
+  return (
+    <SavedEventsProvider>
+      <SavedEventsContent />
+    </SavedEventsProvider>
+  );
+}
+
+function SavedEventsContent() {
+  const { savedEventIds, isSaved, toggleSave, loading } = useSavedEvents();
+
+  const savedEvents = mockEvents.filter((event) => savedEventIds.includes(event.id));
   const now = new Date();
 
   const upcomingEvents = savedEvents.filter((event) => new Date(event.date) >= now);
   const pastEvents = savedEvents.filter((event) => new Date(event.date) < now);
-  const nextEvent = upcomingEvents[0];
 
   return (
     <AppShell userRole="student">
@@ -44,77 +54,58 @@ export default function SavedEventsPage() {
           </div>
         </section>
 
-        <Tabs defaultValue="upcoming" className="w-full">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <TabsList className="h-auto rounded-full bg-muted/70 p-1">
-              <TabsTrigger value="upcoming" className="gap-2 rounded-full px-4 py-2.5">
-                Upcoming
-                <Badge variant="secondary" className="rounded-full px-2 py-0.5 text-xs">
-                  {upcomingEvents.length}
-                </Badge>
-              </TabsTrigger>
-              <TabsTrigger value="past" className="gap-2 rounded-full px-4 py-2.5">
-                Past
-                <Badge variant="secondary" className="rounded-full px-2 py-0.5 text-xs">
-                  {pastEvents.length}
-                </Badge>
-              </TabsTrigger>
-            </TabsList>
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
           </div>
+        ) : (
+          <Tabs defaultValue="upcoming" className="w-full">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <TabsList className="h-auto rounded-full bg-muted/70 p-1">
+                <TabsTrigger value="upcoming" className="gap-2 rounded-full px-4 py-2.5">
+                  Upcoming
+                  <Badge variant="secondary" className="rounded-full px-2 py-0.5 text-xs">
+                    {upcomingEvents.length}
+                  </Badge>
+                </TabsTrigger>
+                <TabsTrigger value="past" className="gap-2 rounded-full px-4 py-2.5">
+                  Past
+                  <Badge variant="secondary" className="rounded-full px-2 py-0.5 text-xs">
+                    {pastEvents.length}
+                  </Badge>
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
-          <TabsContent value="upcoming" className="mt-4 space-y-4">
-            {upcomingEvents.length > 0 ? (
-              upcomingEvents.map((event) => (
-                <SavedEventRow key={event.id} event={event} />
-              ))
-            ) : (
-              <EmptyState
-                title="No upcoming saved events"
-                description="Once you bookmark a few real options, this turns into your personal running plan."
-              />
-            )}
-          </TabsContent>
+            <TabsContent value="upcoming" className="mt-4 space-y-4">
+              {upcomingEvents.length > 0 ? (
+                upcomingEvents.map((event) => (
+                  <SavedEventRow key={event.id} event={event} />
+                ))
+              ) : (
+                <EmptyState
+                  title="No upcoming saved events"
+                  description="Bookmark events from the dashboard and they'll appear here."
+                />
+              )}
+            </TabsContent>
 
-          <TabsContent value="past" className="mt-4 space-y-4">
-            {pastEvents.length > 0 ? (
-              pastEvents.map((event) => (
-                <SavedEventRow key={event.id} event={event} isPast />
-              ))
-            ) : (
-              <EmptyState
-                title="No archived events yet"
-                description="Past events will collect here once your saved list has some history behind it."
-              />
-            )}
-          </TabsContent>
-        </Tabs>
+            <TabsContent value="past" className="mt-4 space-y-4">
+              {pastEvents.length > 0 ? (
+                pastEvents.map((event) => (
+                  <SavedEventRow key={event.id} event={event} isPast />
+                ))
+              ) : (
+                <EmptyState
+                  title="No archived events yet"
+                  description="Past events will collect here once your saved list has some history behind it."
+                />
+              )}
+            </TabsContent>
+          </Tabs>
+        )}
       </div>
     </AppShell>
-  );
-}
-
-function SummaryCard({
-  label,
-  value,
-  detail,
-  icon,
-}: {
-  label: string;
-  value: string;
-  detail: string;
-  icon: ReactNode;
-}) {
-  return (
-    <Card className="border-white/70 bg-white/75 shadow-sm backdrop-blur-sm">
-      <CardContent className="p-4">
-        <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-full bg-foreground text-background">
-          {icon}
-        </div>
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{label}</p>
-        <p className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-foreground">{value}</p>
-        <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{detail}</p>
-      </CardContent>
-    </Card>
   );
 }
 
@@ -122,10 +113,11 @@ function SavedEventRow({
   event,
   isPast = false,
 }: {
-  event: (typeof mockEvents)[0];
+  event: Event;
   isPast?: boolean;
 }) {
-  const [isSaved, setIsSaved] = useState(true);
+  const { isSaved, toggleSave } = useSavedEvents();
+  const saved = isSaved(event.id);
 
   return (
     <Card
@@ -200,13 +192,13 @@ function SavedEventRow({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => setIsSaved(!isSaved)}
+                  onClick={() => toggleSave(event.id)}
                   className={cn(
                     "rounded-full",
-                    isSaved && "text-primary hover:text-primary/80"
+                    saved && "text-primary hover:text-primary/80"
                   )}
                 >
-                  <Bookmark className={cn("h-5 w-5", isSaved && "fill-current")} />
+                  <Bookmark className={cn("h-5 w-5", saved && "fill-current")} />
                 </Button>
                 <Button asChild className="rounded-full px-4" variant={isPast ? "outline" : "default"}>
                   <a href={event.registrationLink} target="_blank" rel="noopener noreferrer">
@@ -251,19 +243,9 @@ function formatFullDate(dateStr: string) {
   });
 }
 
-function formatShortDate(dateStr: string) {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-  });
-}
-
 function formatMonth(dateStr: string) {
   const date = new Date(dateStr);
-  return date.toLocaleDateString("en-GB", {
-    month: "short",
-  });
+  return date.toLocaleDateString("en-GB", { month: "short" });
 }
 
 function formatDay(dateStr: string) {

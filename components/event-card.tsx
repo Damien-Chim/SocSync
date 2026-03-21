@@ -1,21 +1,21 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import { Calendar, Clock, MapPin, Bookmark, ExternalLink, UtensilsCrossed } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useSavedEvents } from "@/components/saved-events-context";
 import type { Event } from "@/lib/types";
 
 interface EventCardProps {
   event: Event;
-  initialSaved?: boolean;
 }
 
-export function EventCard({ event, initialSaved = false }: EventCardProps) {
-  const [isSaved, setIsSaved] = useState(initialSaved);
+export function EventCard({ event }: EventCardProps) {
+  const { isSaved, toggleSave } = useSavedEvents();
+  const saved = isSaved(event.id);
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -28,7 +28,6 @@ export function EventCard({ event, initialSaved = false }: EventCardProps) {
 
   return (
     <Card className="group overflow-hidden border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-300">
-      {/* Banner Image */}
       <div className="relative aspect-[16/9] sm:aspect-[2/1] overflow-hidden">
         <Image
           src={event.bannerImage}
@@ -39,7 +38,6 @@ export function EventCard({ event, initialSaved = false }: EventCardProps) {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         
-        {/* Badges */}
         <div className="absolute top-3 left-3 flex flex-wrap gap-2">
           <Badge 
             className={cn(
@@ -59,20 +57,18 @@ export function EventCard({ event, initialSaved = false }: EventCardProps) {
           )}
         </div>
 
-        {/* Save Button */}
         <button
-          onClick={() => setIsSaved(!isSaved)}
+          onClick={() => toggleSave(event.id)}
           className={cn(
             "absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full transition-all duration-200",
-            isSaved
+            saved
               ? "bg-primary text-primary-foreground"
               : "bg-white/90 text-muted-foreground hover:bg-white hover:text-primary"
           )}
         >
-          <Bookmark className={cn("h-4 w-4", isSaved && "fill-current")} />
+          <Bookmark className={cn("h-4 w-4", saved && "fill-current")} />
         </button>
 
-        {/* Society Info */}
         <div className="absolute bottom-3 left-3 flex items-center gap-2">
           <div className="relative w-7 h-7 flex-shrink-0">
             <Image
@@ -90,17 +86,14 @@ export function EventCard({ event, initialSaved = false }: EventCardProps) {
       </div>
 
       <CardContent className="p-4">
-        {/* Category Tag */}
         <Badge variant="secondary" className="mb-2 text-xs">
           {event.category}
         </Badge>
 
-        {/* Title */}
         <h3 className="font-semibold text-foreground line-clamp-2 mb-3 group-hover:text-primary transition-colors">
           {event.title}
         </h3>
 
-        {/* Details */}
         <div className="space-y-1.5 mb-4">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Calendar className="h-4 w-4 flex-shrink-0" />
@@ -114,7 +107,6 @@ export function EventCard({ event, initialSaved = false }: EventCardProps) {
           </div>
         </div>
 
-        {/* Register Button */}
         <Button 
           asChild 
           className="w-full bg-primary hover:bg-primary/90 font-medium"

@@ -4,16 +4,18 @@ import Image from "next/image";
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { EventCard } from "@/components/event-card";
+import { SavedEventsProvider, useSavedEvents } from "@/components/saved-events-context";
 import { FilterBar } from "@/components/filter-bar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { mockEvents, mockUser } from "@/lib/mock-data";
+import { mockEvents } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 import type { Event, EventCategory } from "@/lib/types";
 import {
   ArrowUpRight,
+  Bookmark,
   Calendar,
   Clock,
   Flame,
@@ -23,6 +25,14 @@ import {
 } from "lucide-react";
 
 export default function DashboardPage() {
+  return (
+    <SavedEventsProvider>
+      <DashboardContent />
+    </SavedEventsProvider>
+  );
+}
+
+function DashboardContent() {
   const searchRef = useRef<HTMLDivElement>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -285,7 +295,6 @@ export default function DashboardPage() {
                         <CompactEventRow
                           key={event.id}
                           event={event}
-                          saved={mockUser.savedEvents.includes(event.id)}
                         />
                       ))
                     ) : (
@@ -320,7 +329,6 @@ export default function DashboardPage() {
                       <EventCard
                         key={event.id}
                         event={event}
-                        initialSaved={mockUser.savedEvents.includes(event.id)}
                       />
                     ))}
                   </div>
@@ -385,13 +393,10 @@ function MetricCard({
   );
 }
 
-function CompactEventRow({
-  event,
-  saved,
-}: {
-  event: Event;
-  saved: boolean;
-}) {
+function CompactEventRow({ event }: { event: Event }) {
+  const { isSaved, toggleSave } = useSavedEvents();
+  const saved = isSaved(event.id);
+
   return (
     <div className="rounded-[1.4rem] border border-border/60 bg-background/80 p-3">
       <div className="flex items-start gap-3">
@@ -407,7 +412,17 @@ function CompactEventRow({
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-3">
             <p className="truncate text-sm font-semibold text-foreground">{event.title}</p>
-            {saved && <Badge className="rounded-full bg-primary/10 text-primary hover:bg-primary/15">Saved</Badge>}
+            <button
+              onClick={() => toggleSave(event.id)}
+              className={cn(
+                "flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-all duration-200",
+                saved
+                  ? "bg-primary/10 text-primary"
+                  : "text-muted-foreground hover:text-primary"
+              )}
+            >
+              <Bookmark className={cn("h-4 w-4", saved && "fill-current")} />
+            </button>
           </div>
           <p className="mt-1 text-sm text-muted-foreground">{event.society.name}</p>
           <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
