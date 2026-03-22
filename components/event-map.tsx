@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import {
   GoogleMap,
   useJsApiLoader,
@@ -21,6 +21,10 @@ import type { Event } from "@/lib/types";
 
 interface EventMapProps {
   events: Event[];
+  /** When set (e.g. sidebar click), map pans to this event and opens details. */
+  focusEventId?: string | null;
+  /** Fires when selection changes (marker, map clear, or focus from parent). */
+  onSelectionChange?: (eventId: string | null) => void;
 }
 
 const mapContainerStyle = {
@@ -60,8 +64,17 @@ function createMarkerIcon(event: Event): string {
   `)}`;
 }
 
-export function EventMap({ events }: EventMapProps) {
+function hasValidCoords(lat: number, lng: number) {
+  return Math.abs(lat) > 1e-6 || Math.abs(lng) > 1e-6;
+}
+
+export function EventMap({
+  events,
+  focusEventId = null,
+  onSelectionChange,
+}: EventMapProps) {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [mapReadyTick, setMapReadyTick] = useState(0);
   const mapRef = useRef<google.maps.Map | null>(null);
 
   const { isLoaded, loadError } = useJsApiLoader({
@@ -71,7 +84,23 @@ export function EventMap({ events }: EventMapProps) {
 
   const onLoad = useCallback((map: google.maps.Map) => {
     mapRef.current = map;
+    setMapReadyTick((t) => t + 1);
   }, []);
+
+  useEffect(() => {
+    if (focusEventId == null) {
+      setSelectedEvent(null);
+      return;
+    }
+    const ev = events.find((e) => e.id === focusEventId);
+    if (!ev) return;
+    setSelectedEvent(ev);
+    const { lat, lng } = ev.coordinates;
+    const map = mapRef.current;
+    if (!map || !hasValidCoords(lat, lng)) return;
+    map.panTo({ lat, lng });
+    map.setZoom(15);
+  }, [focusEventId, events, mapReadyTick]);
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -115,7 +144,10 @@ export function EventMap({ events }: EventMapProps) {
       zoom={13}
       options={mapOptions}
       onLoad={onLoad}
-      onClick={() => setSelectedEvent(null)}
+      onClick={() => {
+        setSelectedEvent(null);
+        onSelectionChange?.(null);
+      }}
     >
       {events.map((event) => (
         <MarkerF
@@ -129,7 +161,10 @@ export function EventMap({ events }: EventMapProps) {
             scaledSize: new google.maps.Size(40, 50),
             anchor: new google.maps.Point(20, 50),
           }}
-          onClick={() => setSelectedEvent(event)}
+          onClick={() => {
+            setSelectedEvent(event);
+            onSelectionChange?.(event.id);
+          }}
         />
       ))}
 
@@ -140,7 +175,10 @@ export function EventMap({ events }: EventMapProps) {
             lng: selectedEvent.coordinates.lng,
           }}
           options={{ pixelOffset: new google.maps.Size(0, -50), maxWidth: 320 }}
-          onCloseClick={() => setSelectedEvent(null)}
+          onCloseClick={() => {
+            setSelectedEvent(null);
+            onSelectionChange?.(null);
+          }}
         >
           <div className="p-1" style={{ minWidth: 250 }}>
             {/* Society Info */}

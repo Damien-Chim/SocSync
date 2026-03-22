@@ -84,9 +84,8 @@ function SavedEventsContent() {
     fetchSavedEvents();
   }, [savedEventIds, loading, supabase]);
 
-  const now = new Date();
-  const upcomingEvents = savedEvents.filter((event) => new Date(event.date) >= now);
-  const pastEvents = savedEvents.filter((event) => new Date(event.date) < now);
+  const upcomingEvents = savedEvents;
+  const pastEvents: typeof savedEvents = [];
   const isLoading = loading || eventsLoading;
 
   return (

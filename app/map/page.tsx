@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { EventMap } from "@/components/event-map";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { UtensilsCrossed, Calendar, MapPin, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { Event, EventCategory } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 function mapDbEvent(row: Record<string, unknown>): Event {
   return {
@@ -41,7 +42,25 @@ function mapDbEvent(row: Record<string, unknown>): Event {
 export default function MapPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [focusedEventId, setFocusedEventId] = useState<string | null>(null);
+  const sidebarListRef = useRef<HTMLDivElement | null>(null);
   const supabase = useMemo(() => createClient(), []);
+
+  useEffect(() => {
+    if (!focusedEventId) return;
+    const el = document.getElementById(`map-event-${focusedEventId}`);
+    const list = sidebarListRef.current;
+    if (!el || !list) return;
+
+    requestAnimationFrame(() => {
+      const gapPx = 12;
+      const prev = el.previousElementSibling;
+      const oneBubble =
+        prev instanceof HTMLElement ? prev.offsetHeight + gapPx : 100;
+      const targetTop = Math.max(0, el.offsetTop - oneBubble);
+      list.scrollTo({ top: targetTop, behavior: "smooth" });
+    });
+  }, [focusedEventId]);
 
   useEffect(() => {
     async function load() {
@@ -83,17 +102,39 @@ export default function MapPage() {
         ) : (
           <div className="grid lg:grid-cols-3 gap-6 h-full">
             <div className="lg:col-span-2 h-[500px] lg:h-full">
-              <EventMap events={events} />
+              <EventMap
+                events={events}
+                focusEventId={focusedEventId}
+                onSelectionChange={setFocusedEventId}
+              />
             </div>
 
-            <div className="space-y-3 lg:overflow-y-auto lg:max-h-full pb-4">
-              <h2 className="text-lg font-semibold text-foreground sticky top-0 bg-background py-2">
+            <div className="flex min-h-0 flex-col lg:h-full lg:max-h-full lg:min-h-0">
+              <h2 className="shrink-0 text-lg font-semibold text-foreground py-2 pb-3">
                 Upcoming Events ({events.length})
               </h2>
+              <div
+                ref={sidebarListRef}
+                className="min-h-0 flex-1 space-y-3 overflow-y-auto pb-4 pr-1 pt-4"
+              >
               {events.map((event) => (
                 <Card
                   key={event.id}
-                  className="border border-border hover:border-primary/30 transition-colors cursor-pointer"
+                  id={`map-event-${event.id}`}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setFocusedEventId(event.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setFocusedEventId(event.id);
+                    }
+                  }}
+                  className={cn(
+                    "border border-border hover:border-primary/30 transition-colors cursor-pointer",
+                    focusedEventId === event.id &&
+                      "ring-2 ring-primary border-primary/50 shadow-md"
+                  )}
                 >
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
@@ -139,6 +180,7 @@ export default function MapPage() {
                   </CardContent>
                 </Card>
               ))}
+              </div>
             </div>
           </div>
         )}

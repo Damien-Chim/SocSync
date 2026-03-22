@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -16,8 +17,82 @@ import {
   Trash2,
   TrendingUp,
   Loader2,
+  MapPin,
+  UtensilsCrossed,
+  Check,
 } from "lucide-react";
+import { DEFAULT_EVENT_YEAR, normalizeDbTime } from "@/lib/event-datetime";
 import { createClient } from "@/lib/supabase/client";
+
+interface ScrapedEvent {
+  sourceUrl?: string;
+  title: string;
+  description?: string;
+  category?: string;
+  date?: string;
+  time?: string;
+  location?: string;
+  freeEvent?: boolean | null;
+  freeFood?: boolean | null;
+  registrationLink?: string;
+  bannerImage?: string;
+}
+
+const CATEGORY_MAP: Record<string, string> = {
+  tech: "Tech", finance: "Finance", social: "Social",
+  industry: "Networking", networking: "Networking",
+  career: "Career", workshop: "Workshop", competition: "Competition",
+};
+
+function parseHumanDate(raw: string): string {
+  const cleaned = raw
+    .replace(/\(.*?\)/g, "")
+    .replace(/(st|nd|rd|th)\b/gi, "")
+    .replace(
+      /^(monday|tuesday|wednesday|thursday|friday|saturday|sunday),?\s*/i,
+      ""
+    )
+    .trim();
+
+  const hasExplicitYear = /\b(19|20)\d{2}\b/.test(cleaned);
+
+  const attempts: string[] = hasExplicitYear
+    ? [cleaned]
+    : [
+        `${cleaned}, ${DEFAULT_EVENT_YEAR}`,
+        `${cleaned} ${DEFAULT_EVENT_YEAR}`,
+        cleaned,
+      ];
+
+  for (const attempt of attempts) {
+    const d = new Date(attempt);
+    if (!isNaN(d.getTime())) {
+      let year = d.getFullYear();
+      if (year < 2000) year = DEFAULT_EVENT_YEAR;
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      return `${year}-${mm}-${dd}`;
+    }
+  }
+
+  return `${DEFAULT_EVENT_YEAR}-01-01`;
+}
+
+function parseHumanTime(raw: string): string {
+  const first = raw.split(/[-–]/).map((s) => s.trim())[0];
+  const match = first.match(
+    /^(\d{1,2}):(\d{2})(?::\d{2})?\s*(am|pm)?$/i
+  );
+  if (match) {
+    let hours = parseInt(match[1], 10);
+    const minutes = parseInt(match[2], 10);
+    const period = (match[3] ?? "").toLowerCase();
+    if (period === "pm" && hours < 12) hours += 12;
+    if (period === "am" && hours === 12) hours = 0;
+    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+  }
+  return normalizeDbTime(first);
+}
 
 interface DbEvent {
   id: string;
@@ -35,7 +110,30 @@ export default function HostDashboardPage() {
   const [followerCount, setFollowerCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
+  const [pendingEvent, setPendingEvent] = useState<ScrapedEvent | null>(null);
+  const [pendingSocietyId, setPendingSocietyId] = useState<string | null>(null);
+  const [showEventModal, setShowEventModal] = useState(false);
+  const [confirmingEvent, setConfirmingEvent] = useState(false);
+
   const supabase = useMemo(() => createClient(), []);
+
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem("pendingScrapedEvents");
+      if (raw) {
+        sessionStorage.removeItem("pendingScrapedEvents");
+        const { events: scrapedEvents, societyId } = JSON.parse(raw) as {
+          events: ScrapedEvent[];
+          societyId: string;
+        };
+        if (scrapedEvents.length > 0) {
+          setPendingEvent(scrapedEvents[0]);
+          setPendingSocietyId(societyId);
+          setShowEventModal(true);
+        }
+      }
+    } catch { /* ignore parse errors */ }
+  }, []);
 
   useEffect(() => {
     async function load() {
@@ -78,8 +176,47 @@ export default function HostDashboardPage() {
     load();
   }, [supabase]);
 
+  const handleConfirmEvent = async () => {
+    if (!pendingEvent || !pendingSocietyId) return;
+    setConfirmingEvent(true);
+
+    const category = CATEGORY_MAP[(pendingEvent.category ?? "").toLowerCase()] ?? "Social";
+    const parsedDate = pendingEvent.date
+      ? parseHumanDate(pendingEvent.date)
+      : new Date().toISOString().slice(0, 10);
+
+    const { data: inserted, error: insertErr } = await supabase.from("events").insert({
+      title: pendingEvent.title,
+      description: pendingEvent.description ?? "",
+      society_id: pendingSocietyId,
+      date: parsedDate,
+      time: pendingEvent.time ? parseHumanTime(pendingEvent.time) : "00:00",
+      location: pendingEvent.location ?? "TBA",
+      price: pendingEvent.freeEvent === false ? 0 : null,
+      has_free_food: !!pendingEvent.freeFood,
+      registration_link: pendingEvent.registrationLink ?? null,
+      banner_image_url: pendingEvent.bannerImage ?? null,
+      category,
+      instagram_post_url: pendingEvent.sourceUrl ?? null,
+    }).select("id, title, date, time, category, banner_image_url").single();
+
+    if (insertErr) {
+      console.error("[Dashboard] Event insert failed:", insertErr.message);
+    } else if (inserted) {
+      setEvents((prev) => [{ ...inserted, save_count: 0 }, ...prev]);
+    }
+
+    setConfirmingEvent(false);
+    setShowEventModal(false);
+  };
+
+  const handleSkipEvent = () => {
+    setShowEventModal(false);
+  };
+
   const totalSaves = events.reduce((sum, e) => sum + (e.save_count ?? 0), 0);
-  const upcomingEvents = events.filter((event) => new Date(`${event.date}T${event.time || "00:00"}`).getTime() >= Date.now());
+  const avgSavesPerEvent =
+    events.length > 0 ? Math.round(totalSaves / events.length) : 0;
   const topEvent = [...events].sort((a, b) => (b.save_count ?? 0) - (a.save_count ?? 0))[0];
 
   const handleDelete = async (eventId: string) => {
@@ -145,7 +282,7 @@ export default function HostDashboardPage() {
               </p>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <SnapshotStat label="Published events" value={events.length} />
-                <SnapshotStat label="Upcoming now" value={upcomingEvents.length} />
+                <SnapshotStat label="Avg. saves / event" value={avgSavesPerEvent} />
                 <SnapshotStat label="Followers" value={followerCount} />
                 <SnapshotStat label="Total saves" value={totalSaves} />
               </div>
@@ -170,8 +307,8 @@ export default function HostDashboardPage() {
             icon={Users}
           />
           <StatCard
-            title="Upcoming"
-            value={upcomingEvents.length}
+            title="Avg. saves / event"
+            value={avgSavesPerEvent}
             icon={TrendingUp}
           />
         </div>
@@ -291,22 +428,103 @@ export default function HostDashboardPage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <InsightRow
-                  label="Events live now"
+                  label="Published events"
                   value={events.length}
                 />
                 <InsightRow
-                  label="Upcoming events"
-                  value={upcomingEvents.length}
-                />
-                <InsightRow
-                  label="Average saves per event"
-                  value={events.length > 0 ? Math.round(totalSaves / events.length) : 0}
+                  label="Avg. saves per event"
+                  value={avgSavesPerEvent}
                 />
               </CardContent>
             </Card>
           </div>
         </div>
       </div>
+
+      <Dialog open={showEventModal} onOpenChange={(open) => { if (!open) handleSkipEvent(); }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Event found on Instagram</DialogTitle>
+            <DialogDescription>
+              We scraped your latest post and found an event. Add it to your dashboard?
+            </DialogDescription>
+          </DialogHeader>
+
+          {pendingEvent && (
+            <div className="space-y-4">
+              {pendingEvent.bannerImage && (
+                <div className="relative h-40 w-full overflow-hidden rounded-lg">
+                  <Image
+                    src={pendingEvent.bannerImage}
+                    alt={pendingEvent.title}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              )}
+
+              <div>
+                <h3 className="text-lg font-semibold">{pendingEvent.title}</h3>
+                {pendingEvent.description && (
+                  <p className="mt-1 text-sm text-muted-foreground line-clamp-3">
+                    {pendingEvent.description}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                {pendingEvent.date && (
+                  <Badge variant="secondary" className="gap-1">
+                    <Calendar className="h-3 w-3" />
+                    {pendingEvent.date}
+                  </Badge>
+                )}
+                {pendingEvent.time && (
+                  <Badge variant="secondary">{pendingEvent.time}</Badge>
+                )}
+                {pendingEvent.location && (
+                  <Badge variant="secondary" className="gap-1">
+                    <MapPin className="h-3 w-3" />
+                    {pendingEvent.location}
+                  </Badge>
+                )}
+                {pendingEvent.freeFood && (
+                  <Badge className="bg-amber-500/10 text-amber-700 gap-1">
+                    <UtensilsCrossed className="h-3 w-3" />
+                    Free Food
+                  </Badge>
+                )}
+                {pendingEvent.category && (
+                  <Badge variant="outline">{pendingEvent.category}</Badge>
+                )}
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="ghost" onClick={handleSkipEvent} disabled={confirmingEvent}>
+              Skip
+            </Button>
+            <Button
+              onClick={handleConfirmEvent}
+              disabled={confirmingEvent}
+              className="bg-accent text-accent-foreground hover:bg-accent/90"
+            >
+              {confirmingEvent ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Adding...
+                </>
+              ) : (
+                <>
+                  <Check className="mr-2 h-4 w-4" />
+                  Add to Dashboard
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
