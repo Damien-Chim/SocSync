@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { type ReactNode } from "react";
 import { AppShell } from "@/components/app-shell";
 import { useSocieties } from "@/components/societies-context";
@@ -141,8 +142,13 @@ function FeaturedSocietyCard({
   weeklyEventCount: number;
   reason: string;
 }) {
+  const router = useRouter();
+
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-[2rem] border border-border/60 bg-[linear-gradient(145deg,rgba(255,255,255,0.98),rgba(244,247,255,0.94)_55%,rgba(255,245,235,0.96))] shadow-[0_18px_55px_rgba(24,24,27,0.08)]">
+    <div
+      onClick={() => router.push(`/society/${encodeURIComponent(society.id)}`)}
+      className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-[2rem] border border-border/60 bg-[linear-gradient(145deg,rgba(255,255,255,0.98),rgba(244,247,255,0.94)_55%,rgba(255,245,235,0.96))] shadow-[0_18px_55px_rgba(24,24,27,0.08)] transition-colors hover:border-foreground/15"
+    >
       <div className="border-b border-border/60 px-6 py-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex min-w-0 items-start gap-4">
@@ -158,7 +164,7 @@ function FeaturedSocietyCard({
 
             <div className="min-w-0 flex-1 space-y-3">
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="break-words text-2xl font-semibold tracking-[-0.03em] text-foreground sm:text-3xl">
+                <h2 className="break-words text-2xl font-semibold tracking-[-0.03em] text-foreground transition-colors group-hover:text-primary sm:text-3xl">
                   {society.name}
                 </h2>
                 <Badge variant="secondary" className="rounded-full">
@@ -174,7 +180,10 @@ function FeaturedSocietyCard({
           <Button
             variant={isFollowed ? "outline" : "default"}
             className="w-full rounded-full px-5 sm:w-fit lg:shrink-0"
-            onClick={onToggleFollow}
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleFollow();
+            }}
           >
             {isFollowed ? "Following" : "Follow"}
           </Button>
@@ -247,8 +256,13 @@ function CompactSocietyRow({
   onToggleFollow: () => void;
   weeklyEventCount: number;
 }) {
+  const router = useRouter();
+
   return (
-    <div className="rounded-[1.35rem] border border-border/60 bg-background/80 p-4">
+    <div
+      onClick={() => router.push(`/society/${encodeURIComponent(society.id)}`)}
+      className="group cursor-pointer rounded-[1.35rem] border border-border/60 bg-background/80 p-4 transition-colors hover:border-foreground/15"
+    >
       <div className="flex items-start justify-between gap-4">
         <div className="flex min-w-0 items-start gap-3">
           <div className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-[1rem] bg-muted">
@@ -261,7 +275,7 @@ function CompactSocietyRow({
             />
           </div>
           <div className="min-w-0">
-            <p className="truncate text-base font-semibold text-foreground">{society.name}</p>
+            <p className="truncate text-base font-semibold text-foreground transition-colors group-hover:text-primary">{society.name}</p>
             <p className="mt-1 text-sm text-muted-foreground">{society.description}</p>
             <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
               <span>{weeklyEventCount} events this week</span>
@@ -272,7 +286,10 @@ function CompactSocietyRow({
 
         <button
           type="button"
-          onClick={onToggleFollow}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleFollow();
+          }}
           className="rounded-full border border-border px-3 py-1 text-xs font-medium text-foreground transition-colors hover:bg-muted"
         >
           {isFollowed ? "Following" : "Follow"}
