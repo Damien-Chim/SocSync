@@ -4,7 +4,7 @@ import { useState, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Zap, Eye, EyeOff, Upload, User, Building2, Loader2, X } from "lucide-react";
+import { ArrowLeft, Zap, Eye, EyeOff, Upload, User, Building2, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -141,12 +141,23 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-accent/10 p-4">
       <div className="w-full max-w-md">
-        {/* Logo */}
-        <div className="flex items-center justify-center gap-2 mb-8">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/30">
-            <Zap className="h-7 w-7 text-primary-foreground" />
-          </div>
-          <span className="text-3xl font-bold text-foreground">SocSync</span>
+        <div className="mb-6">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to home
+          </Link>
+        </div>
+
+        <div className="mb-8 flex items-center justify-center">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/30">
+              <Zap className="h-7 w-7 text-primary-foreground" />
+            </div>
+            <span className="text-3xl font-bold text-foreground">SocSync</span>
+          </Link>
         </div>
 
         <Card className="border-0 shadow-2xl shadow-primary/10">

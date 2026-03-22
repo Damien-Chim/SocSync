@@ -2,28 +2,33 @@
 
 import { AppShell } from "@/components/app-shell";
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { Zap, Target, Users, Heart, Sparkles, Globe } from "lucide-react";
 
 const teamMembers = [
   {
-    name: "Sarah Chen",
-    role: "Founder & CEO",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=sarah",
+    name: "Aaron Lee",
+    role: "Co-Founder",
+    initials: "AL",
+    accent: "from-slate-900 to-slate-700 text-white",
   },
   {
-    name: "Marcus Williams",
-    role: "Head of Product",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=marcus",
+    name: "Richard Tam",
+    role: "Co-Founder",
+    initials: "RT",
+    accent: "from-stone-800 to-stone-600 text-white",
   },
   {
-    name: "Priya Patel",
-    role: "Lead Developer",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=priya",
+    name: "Damien Chim",
+    role: "Co-Founder",
+    initials: "DC",
+    accent: "from-zinc-900 to-zinc-700 text-white",
   },
   {
-    name: "James O'Connor",
-    role: "Community Manager",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=james",
+    name: "Vincent Crisostomo",
+    role: "Co-Founder",
+    initials: "VC",
+    accent: "from-neutral-900 to-neutral-700 text-white",
   },
 ];
 
@@ -119,12 +124,15 @@ export default function AboutPage() {
                 className="border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-300 text-center"
               >
                 <CardContent className="p-6">
-                  <div className="relative mx-auto mb-4">
-                    <img
-                      src={member.avatar}
-                      alt={member.name}
-                      className="w-20 h-20 rounded-full mx-auto bg-muted"
-                    />
+                  <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full border border-white/70 bg-gradient-to-br shadow-lg shadow-black/10 ring-4 ring-background">
+                    <div
+                      className={cn(
+                        "flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br text-xl font-semibold tracking-[0.08em]",
+                        member.accent
+                      )}
+                    >
+                      {member.initials}
+                    </div>
                   </div>
                   <h3 className="font-semibold text-foreground">{member.name}</h3>
                   <p className="text-sm text-muted-foreground mt-1">{member.role}</p>
