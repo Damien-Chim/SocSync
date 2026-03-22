@@ -5,7 +5,7 @@ Runs the full Instagram → events pipeline in one go:
   1. scrape_posts        → posts.json
   2. scrape_post_details → post_details.json
   3. extract_events      → events.json
-  4. upload_to_supabase  → inserts upcoming events into DB
+  4. upload_to_supabase  → inserts parsed events into DB (optional)
 
 Usage:
     python run_pipeline.py --account <instagram_handle> --society-id <uuid>
@@ -15,7 +15,6 @@ import argparse
 import json
 import os
 import re
-from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -365,17 +364,23 @@ CATEGORY_MAP: Dict[str, str] = {
 }
 
 
+DEFAULT_EVENT_YEAR = 2026
+
+
 def parse_date(raw: Optional[str]) -> Optional[str]:
     """Try to parse a freeform date string into YYYY-MM-DD."""
     if not raw:
         return None
     cleaned = re.sub(r"\(.*?\)", "", raw).strip()
+    has_explicit_year = bool(re.search(r"\b(19\d{2}|20\d{2})\b", cleaned))
     try:
         dt = dateparser.parse(cleaned, dayfirst=True, fuzzy=True)
         if dt is None:
             return None
-        if dt.year < 2000:
-            dt = dt.replace(year=date.today().year)
+        if not has_explicit_year:
+            dt = dt.replace(year=DEFAULT_EVENT_YEAR)
+        elif dt.year < 2000:
+            dt = dt.replace(year=DEFAULT_EVENT_YEAR)
         return dt.strftime("%Y-%m-%d")
     except (ValueError, OverflowError):
         return None
@@ -417,7 +422,7 @@ def upload_events_to_supabase(
     events: List[Dict[str, Any]],
     society_id: str,
 ) -> int:
-    """Filter for upcoming events and insert into Supabase. Returns count inserted."""
+    """Insert parsed events into Supabase. Returns count inserted."""
     supabase_url = os.getenv("NEXT_PUBLIC_SUPABASE_URL")
     service_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 
@@ -426,7 +431,6 @@ def upload_events_to_supabase(
         return 0
 
     sb = create_supabase_client(supabase_url, service_key)
-    today = date.today().isoformat()
     inserted = 0
 
     for record in events:
@@ -437,7 +441,7 @@ def upload_events_to_supabase(
             continue
 
         parsed_date = parse_date(ev.get("date"))
-        if not parsed_date or parsed_date < today:
+        if not parsed_date:
             continue
 
         title = ev.get("event_title")
