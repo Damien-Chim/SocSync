@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "tunnel": "ngrok http 3000"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

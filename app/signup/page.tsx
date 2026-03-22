@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { Suspense, useState, useRef, useCallback, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowLeft,
   Zap,
@@ -55,8 +55,9 @@ function extractInstagramUsername(value: string) {
   }
 }
 
-export default function SignupPage() {
+function SignupForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState<UserRole>("student");
   const [loading, setLoading] = useState(false);
@@ -72,6 +73,13 @@ export default function SignupPage() {
     societyName: "",
     instagramLink: "",
   });
+
+  // Landing "Register as a host" links to /signup?role=host
+  useEffect(() => {
+    if (searchParams.get("role") === "host") {
+      setRole("host");
+    }
+  }, [searchParams]);
 
   const handleFileSelect = useCallback((file: File) => {
     if (!file.type.startsWith("image/")) return;
@@ -533,5 +541,24 @@ export default function SignupPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+function SignupFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-accent/10 p-4">
+      <div className="flex flex-col items-center gap-3 text-muted-foreground">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <p className="text-sm">Loading…</p>
+      </div>
+    </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={<SignupFallback />}>
+      <SignupForm />
+    </Suspense>
   );
 }
