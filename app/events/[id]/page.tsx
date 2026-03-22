@@ -152,7 +152,7 @@ export default async function EventDetailPage({
                 {event.registrationLink && (
                   <Button asChild className="rounded-full px-5">
                     <a href={event.registrationLink} target="_blank" rel="noopener noreferrer">
-                      Open registration
+                      Register Now
                       <ArrowUpRight className="ml-2 h-4 w-4" />
                     </a>
                   </Button>
