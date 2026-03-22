@@ -86,9 +86,9 @@ export default async function SocietyDetailPage({
 
   const society = mapSociety(societyRow as Record<string, unknown>);
   const today = new Date().toISOString().slice(0, 10);
-  const upcomingEvents = (eventRows ?? [])
-    .map((row) => mapDbEvent(row as Record<string, unknown>))
-    .filter((event) => event.date >= today);
+  const allEvents = (eventRows ?? []).map((row) => mapDbEvent(row as Record<string, unknown>));
+  const upcomingEvents = allEvents.filter((event) => event.date >= today);
+  const pastEvents = allEvents.filter((event) => event.date < today).reverse();
 
   return (
     <div className="space-y-8">
@@ -137,6 +137,10 @@ export default async function SocietyDetailPage({
                     <Calendar className="h-4 w-4" />
                     {upcomingEvents.length} upcoming events
                   </span>
+                  <span className="inline-flex items-center gap-2 rounded-full bg-muted px-4 py-2">
+                    <Calendar className="h-4 w-4" />
+                    {pastEvents.length} past events
+                  </span>
                 </div>
               </div>
             </div>
@@ -162,6 +166,28 @@ export default async function SocietyDetailPage({
         ) : (
           <p className="rounded-[1.5rem] border border-dashed border-border bg-card/40 px-6 py-10 text-center text-sm text-muted-foreground">
             No upcoming events are listed for this society right now.
+          </p>
+        )}
+      </section>
+
+      <section className="space-y-4">
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">
+            Past events
+          </h2>
+        </div>
+
+        {pastEvents.length > 0 ? (
+          <SavedEventsProvider>
+            <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+              {pastEvents.map((event) => (
+                <EventCard key={event.id} event={event} />
+              ))}
+            </div>
+          </SavedEventsProvider>
+        ) : (
+          <p className="rounded-[1.5rem] border border-dashed border-border bg-card/40 px-6 py-10 text-center text-sm text-muted-foreground">
+            No past events are listed for this society yet.
           </p>
         )}
       </section>

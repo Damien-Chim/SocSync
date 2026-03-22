@@ -157,14 +157,18 @@ function DashboardContent() {
       });
   }, [allEvents]);
 
-  const sortedByEventTime = useMemo(() => {
+  const sortedForAllEvents = useMemo(() => {
     return [...allEvents].sort((a, b) => {
-      return getEventTimestamp(a) - getEventTimestamp(b);
+      const dateDiff = getEventDateTimestamp(a) - getEventDateTimestamp(b);
+      if (dateDiff !== 0) {
+        return dateDiff;
+      }
+      return b.saveCount - a.saveCount;
     });
   }, [allEvents]);
 
   const filteredUpcomingEvents = useMemo(() => {
-    return sortedByEventTime.filter((event) => {
+    return sortedForAllEvents.filter((event) => {
       const normalizedQuery = searchQuery.trim().toLowerCase();
 
       if (
@@ -193,7 +197,7 @@ function DashboardContent() {
       }
       return true;
     });
-  }, [sortedByEventTime, searchQuery, selectedCategories, freeFoodOnly, freeEventsOnly]);
+  }, [sortedForAllEvents, searchQuery, selectedCategories, freeFoodOnly, freeEventsOnly]);
 
   const featuredEvent = featuredCandidates[0];
   const freeAndEasyEvents = freeEntriesByDate.slice(0, 3);

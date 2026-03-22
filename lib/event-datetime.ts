@@ -10,11 +10,16 @@ export function normalizeDbDate(value: unknown): string {
   }
   const s = String(value);
   const m = s.match(/^(\d{4}-\d{2}-\d{2})/);
-  if (m) return m[1];
+  if (m) {
+    const [year, month, day] = m[1].split("-");
+    const normalizedYear =
+      parseInt(year, 10) < DEFAULT_EVENT_YEAR ? String(DEFAULT_EVENT_YEAR) : year;
+    return `${normalizedYear}-${month}-${day}`;
+  }
   const d = new Date(s);
   if (!Number.isNaN(d.getTime())) {
     let y = d.getFullYear();
-    if (y < 2000) y = DEFAULT_EVENT_YEAR;
+    if (y < DEFAULT_EVENT_YEAR) y = DEFAULT_EVENT_YEAR;
     const mo = String(d.getMonth() + 1).padStart(2, "0");
     const da = String(d.getDate()).padStart(2, "0");
     return `${y}-${mo}-${da}`;
