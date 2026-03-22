@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Calendar, Clock, MapPin, Bookmark, ExternalLink, UtensilsCrossed } from "lucide-react";
+import { Calendar, Clock, MapPin, Bookmark, ArrowUpRight, UtensilsCrossed } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -116,10 +116,10 @@ export function EventCard({ event }: EventCardProps) {
           asChild 
           className="w-full bg-primary hover:bg-primary/90 font-medium"
         >
-          <a href={event.registrationLink} target="_blank" rel="noopener noreferrer">
-            Register
-            <ExternalLink className="ml-2 h-4 w-4" />
-          </a>
+          <Link href={`/events/${encodeURIComponent(event.id)}`}>
+            View details
+            <ArrowUpRight className="ml-2 h-4 w-4" />
+          </Link>
         </Button>
       </CardContent>
     </Card>

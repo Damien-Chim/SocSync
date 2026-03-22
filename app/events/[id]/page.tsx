@@ -5,8 +5,54 @@ import { AppShell } from "@/components/app-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { getScrapedEvents } from "@/lib/scraped-events";
+import { normalizeDbDate, normalizeDbTime } from "@/lib/event-datetime";
+import { createClient } from "@/lib/supabase/server";
+import type { Event, EventCategory } from "@/lib/types";
 import { ArrowLeft, ArrowUpRight, Calendar, Clock, MapPin } from "lucide-react";
+
+function mapDbEvent(row: Record<string, unknown>): Event {
+  return {
+    id: row.id as string,
+    title: row.title as string,
+    description: (row.description as string) ?? "",
+    sourceUrl: (row.instagram_post_url as string) ?? "",
+    society: {
+      id: row.society_id as string,
+      name: (row.society_name as string) ?? "",
+      logo: (row.society_logo as string) ?? "",
+      category: (row.society_category as EventCategory) ?? "Tech",
+      description: "",
+      followerCount: 0,
+    },
+    date: normalizeDbDate(row.date),
+    time: normalizeDbTime(row.time),
+    location: (row.location as string) ?? "",
+    coordinates: {
+      lat: (row.latitude as number) ?? 0,
+      lng: (row.longitude as number) ?? 0,
+    },
+    price: row.price == null ? "Free" : Number(row.price),
+    hasFreeFood: (row.has_free_food as boolean) ?? false,
+    registrationLink: (row.registration_link as string) ?? "",
+    bannerImage:
+      (row.banner_image_url as string) ??
+      "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=400&fit=crop",
+    category: (row.category as EventCategory) ?? "Tech",
+    saveCount: (row.save_count as number) ?? 0,
+  };
+}
+
+function getInstagramUrl(event: Event) {
+  if (event.sourceUrl) {
+    return event.sourceUrl;
+  }
+
+  if (event.registrationLink && event.registrationLink.includes("instagram.com")) {
+    return event.registrationLink;
+  }
+
+  return "";
+}
 
 export default async function EventDetailPage({
   params,
@@ -14,12 +60,24 @@ export default async function EventDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const event = getScrapedEvents().find((item) => item.id === id);
+  const supabase = await createClient();
 
-  if (!event) {
+  const { data, error } = await supabase
+    .from("events_with_details")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) {
+    console.error("[EventDetail] Failed to load event:", error.message);
+  }
+
+  if (!data) {
     notFound();
   }
 
+  const event = mapDbEvent(data as Record<string, unknown>);
+  const instagramUrl = getInstagramUrl(event);
   return (
     <AppShell userRole="student">
       <div className="space-y-6">
@@ -81,25 +139,7 @@ export default async function EventDetailPage({
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
-                  <span>{event.location}</span>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  Summary
-                </p>
-                <p className="text-sm leading-7 text-foreground/80">{event.description}</p>
-              </div>
-
-              <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  Full Instagram caption
-                </p>
-                <div className="rounded-[1.4rem] border border-border/60 bg-muted/30 p-5">
-                  <p className="whitespace-pre-wrap text-sm leading-7 text-foreground/85">
-                    {event.sourceCaption || "No caption available."}
-                  </p>
+                  <span>{event.location || "Location TBA"}</span>
                 </div>
               </div>
 
@@ -107,19 +147,31 @@ export default async function EventDetailPage({
                 {event.registrationLink && (
                   <Button asChild className="rounded-full px-5">
                     <a href={event.registrationLink} target="_blank" rel="noopener noreferrer">
-                      Open original post
+                      Open registration
                       <ArrowUpRight className="ml-2 h-4 w-4" />
                     </a>
                   </Button>
                 )}
-                {event.sourceUrl && event.sourceUrl !== event.registrationLink && (
+                {instagramUrl && (
                   <Button asChild variant="outline" className="rounded-full px-5">
-                    <a href={event.sourceUrl} target="_blank" rel="noopener noreferrer">
+                    <a href={instagramUrl} target="_blank" rel="noopener noreferrer">
                       View on Instagram
                     </a>
                   </Button>
                 )}
               </div>
+
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  Event details
+                </p>
+                <div className="rounded-[1.4rem] border border-border/60 bg-muted/30 p-5">
+                  <p className="whitespace-pre-wrap text-sm leading-7 text-foreground/85">
+                    {event.description || "More details have not been added for this event yet."}
+                  </p>
+                </div>
+              </div>
+
             </CardContent>
           </div>
         </Card>
@@ -129,7 +181,7 @@ export default async function EventDetailPage({
 }
 
 function formatDate(dateStr: string) {
-  const date = new Date(dateStr);
+  const date = new Date(`${dateStr}T00:00:00`);
   return date.toLocaleDateString("en-GB", {
     weekday: "long",
     day: "numeric",
