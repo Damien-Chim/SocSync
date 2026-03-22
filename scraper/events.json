@@ -1,0 +1,172 @@
+[
+  {
+    "source_url": "https://www.instagram.com/syncsusyd/p/DVBL25ckeUa/",
+    "source_caption": "syncsusyd 4 w INTRODUCING YOUR 2026–2027 SYNCS TOP 4 AND EVENT DIRECTORS🫡 Tim & Jeff leading 💪🧑‍🍳, Robin keeping it tight 🎀, Angela guarding the budget 💸 Plus our AMAZING Tech (Hanna & Daniel) and Social (Vivian & Aaron) Events execs making it all happen behind the scenes. WELCOME Top 4 and Event Coordinators 💙",
+    "event": {
+      "event_title": "Introducing Your 2026–2027 Syncs Top 4 and Event Directors",
+      "description": "A post introducing the leadership team for 2026–2027, highlighting top executives and event coordinators for both tech and social events.",
+      "category": "social",
+      "date": null,
+      "time": null,
+      "location": null,
+      "free_event": null,
+      "free_food": false,
+      "external_registration_link": null,
+      "is_event_like": false,
+      "confidence": 1
+    }
+  },
+  {
+    "source_url": "https://www.instagram.com/syncsusyd/p/DVBLgTPEcSI/",
+    "source_caption": "syncsusyd 4 w INTRODUCING YOUR 2026–2027 SYNCS INDUSTRY & PR TEAMS 🫡 Rebecca, Kerris & Hadi leading Industry 🤝💼 Cynthia, Melissa, Chloe & Daniel shaping PR 📸📝 From the very partnerships you see to the posts you double tap… WELCOME Industry & PR 💙",
+    "event": {
+      "event_title": "INTRODUCING YOUR 2026–2027 SYNCS INDUSTRY & PR TEAMS",
+      "description": "An announcement introducing the new Industry and PR teams with Rebecca, Kerris, & Hadi leading Industry and Cynthia, Melissa, Chloe & Daniel shaping PR.",
+      "category": "industry",
+      "date": null,
+      "time": null,
+      "location": null,
+      "free_event": null,
+      "free_food": false,
+      "external_registration_link": null,
+      "is_event_like": false,
+      "confidence": 1
+    }
+  },
+  {
+    "source_url": "https://www.instagram.com/syncsusyd/p/DVBLJwzEfWX/",
+    "source_caption": "syncsusyd Edited • 4 w INTRODUCING YOUR 2026–2027 SYNCS DEVS & REPS 🫡 Vincent, Hugo & Nikhil building systems 💻⚙️ Damien, Richard, Daniel, Robin & Anushka representing the cohort 🎤📣 The voices at the front, and the coding in the back 🎉 Please give a warm WELCOME to our Devs & Reps 💙",
+    "event": {
+      "event_title": "Introducing Your 2026–2027 Syncs Devs & Reps",
+      "description": "A social media announcement introducing the new Syncs Devs & Reps team, featuring Vincent, Hugo & Nikhil for systems building and Damien, Richard, Daniel, Robin & Anushka representing the cohort.",
+      "category": "social",
+      "date": null,
+      "time": null,
+      "location": null,
+      "free_event": null,
+      "free_food": false,
+      "external_registration_link": null,
+      "is_event_like": false,
+      "confidence": 0.9
+    }
+  },
+  {
+    "source_url": "https://www.instagram.com/syncsusyd/p/DWJUt02EYKo/",
+    "source_caption": "syncsusyd 16 h What if robots could see, think, and act in the real world just like humans? 🤖 Join us as Dr. William Zhi dives into Embodied AI where robots learn from humans and operate beyond controlled settings. 🧠 Learn how robots pick up skills from just a few demonstrations 🌍 Adapt to new, unpredictable environments ⚙️ And leverage foundation models to improve perception 📅 26 March (Week 5) ⏰ 6–8PM 📍 Boardroom 124, J12 (CSB) 🍕 PEP hours + free food included Perfect for anyone interested in AI, robotics, or the future of intelligent systems. #SYNCS #USYD #EmbodiedAI #Robotics",
+    "event": {
+      "event_title": "Embodied AI with Dr. William Zhi",
+      "description": "Dr. William Zhi explores how robots learn from human demonstrations, adapt to unpredictable environments, and leverage foundation models to enhance perception in uncontrolled settings.",
+      "category": "tech",
+      "date": "26 March",
+      "time": "6–8PM",
+      "location": "Boardroom 124, J12 (CSB)",
+      "free_event": null,
+      "free_food": true,
+      "external_registration_link": null,
+      "is_event_like": true,
+      "confidence": 1.0
+    }
+  },
+  {
+    "source_url": "https://www.instagram.com/usydsuams/p/DWGICCKD8-2/",
+    "source_caption": "1. Be a member of both SUAMS & SYNCS (it’s free!) 2. Follow both our Instagram accounts @usydsuams @syncsusyd 3. Tag a friend in the comments That’s it. Free memberships, free entry, and you could walk away with an AirPods 4, Air Fryer or a $100 Cole’s Gift Card 🙈 What are you waiting for !?? 🔗 Links in bio to sign up to both socs. ⏰ Giveaway closes 22nd March — tag someone NOW and get them in on it.",
+    "event": {
+      "event_title": null,
+      "description": "Follow the instructions to become a member of both SUAMS & SYNCS for free, tag a friend, and enter a giveaway for prizes including AirPods 4, an Air Fryer, or a $100 Cole’s Gift Card. The giveaway closes on 22nd March.",
+      "category": "social",
+      "date": "22nd March",
+      "time": null,
+      "location": null,
+      "free_event": true,
+      "free_food": false,
+      "external_registration_link": null,
+      "is_event_like": true,
+      "confidence": 1.0
+    }
+  },
+  {
+    "source_url": "https://www.instagram.com/syncsusyd/p/DWFKHEgk78Y/",
+    "source_caption": "syncsusyd 2 d Are you CURIOUS about our weekly events 👀 (we know you are)… Join us every WEDNESDAY & THURSDAY for: 💻 Leetcoding Club 🎲 Social Nights 🌭 Weekly BBQ 🎤 Tech Talks Here at SYNCS, we have a great mix of tech, industry and social events for YOU (yes you) to enjoy! Please feel free to drop by any of our events each week, we would love to see you there! P.S. free food is provided 😮‍💨",
+    "event": {
+      "event_title": "Weekly Events at SYNCS",
+      "description": "SYNCS hosts weekly events every Wednesday and Thursday, featuring Leetcoding Club, Social Nights, Weekly BBQ, and Tech Talks. Free food is provided and everyone is welcome to drop by any event each week.",
+      "category": "social",
+      "date": "Every Wednesday & Thursday",
+      "time": null,
+      "location": null,
+      "free_event": null,
+      "free_food": true,
+      "external_registration_link": null,
+      "is_event_like": true,
+      "confidence": 1.0
+    }
+  },
+  {
+    "source_url": "https://www.instagram.com/syncsusyd/p/DV-Kj_pkeOT/",
+    "source_caption": "syncsusyd Edited • 5 d Scoop & Toast 🍨🍞 is HERE! Come grab a sweet treat ✨, meet some new friends, and take a break between classes 💙 📍 J12 Front Lawn ⏰ Thursday 19 March, 11:00AM–12:00PM",
+    "event": {
+      "event_title": "Scoop & Toast",
+      "description": "A campus social event where participants can grab a sweet treat, meet new friends, and take a break between classes.",
+      "category": "social",
+      "date": "Thursday 19 March",
+      "time": "11:00AM–12:00PM",
+      "location": "J12 Front Lawn",
+      "free_event": null,
+      "free_food": null,
+      "external_registration_link": null,
+      "is_event_like": true,
+      "confidence": 1
+    }
+  },
+  {
+    "source_url": "https://www.instagram.com/syncsusyd/p/DV9hixPE0gz/",
+    "source_caption": "syncsusyd Edited • 5 d Are you interested in getting more involved with SYNCS? Join us for our Semester 1 GM to hear about upcoming events, meet the team, and nominate yourself for leadership roles. Let your friends know and don’t miss YOUR chance this semester! 📅 Wed 25 March 📍 Boardroom 124, J12 CSB ⏰ 4:00PM-6:00PM 🚀 Open Roles - First Year Rep - Undergrad Rep - Postgrad Rep - International Rep - Diversity Rep Nominate yourself below: 👉 https://forms.gle/hFMSpE2K9KBP9QZ2A Check out the meeting agenda: 👉 https://docs.google.com/document/d/12JblNxMsai6-XLjSvvUeDkEYlCyHqRM6jkOvj3wZgt8/edit?usp=sharing",
+    "event": {
+      "event_title": "Semester 1 GM",
+      "description": "Join SYNCS for their Semester 1 General Meeting to learn about upcoming events, meet the team, and nominate yourself for leadership roles including First Year Rep, Undergrad Rep, Postgrad Rep, International Rep, and Diversity Rep.",
+      "category": "social",
+      "date": "Wed 25 March",
+      "time": "4:00PM-6:00PM",
+      "location": "Boardroom 124, J12 CSB",
+      "free_event": null,
+      "free_food": false,
+      "external_registration_link": "https://forms.gle/hFMSpE2K9KBP9QZ2A",
+      "is_event_like": true,
+      "confidence": 1.0
+    }
+  },
+  {
+    "source_url": "https://www.instagram.com/syncsusyd/p/DV7HvLOE-iG/",
+    "source_caption": "syncsusyd 6 d Another week, another STACK of SYNCS events 😮‍💨👏 Whether you’re: 🔗 battling LINKED LISTS 🥀 at Leetcoding Club 🍦 grabbing (free) ICE CREAM at Scoop & Toast 🧠 learning how to PITCH a conference talk 🤝 networking with industry at our 2026 ANNUAL INN …there’s something happening ALMOST EVERY DAY! Come say hi to our team and make some new friends at our events this week ✨",
+    "event": {
+      "event_title": "STACK of SYNCS events",
+      "description": "A week of diverse SYNCS events including battling Linked Lists at Leetcoding Club, enjoying free ice cream at Scoop & Toast, learning how to pitch a conference talk, and networking with industry at the 2026 Annual Inn. Come say hi to the team and make new friends!",
+      "category": "social",
+      "date": null,
+      "time": null,
+      "location": null,
+      "free_event": null,
+      "free_food": true,
+      "external_registration_link": null,
+      "is_event_like": true,
+      "confidence": 0.95
+    }
+  },
+  {
+    "source_url": "https://www.instagram.com/syncsusyd/p/DV5Xw-gERBn/",
+    "source_caption": "• Ideate conference talk topics • Structure and pitch your proposal • Understand how conference talks are selected Whether you’ve built something cool, researched a topic, or just want to share what you’re learning… this session will show you how to take the FIRST STEP into speaking. 📍 Boardroom 124 J12 (CSB) 🗓 Thursday 19 March 🕕 6–8pm 🍕 Free food + PEP hours",
+    "event": {
+      "event_title": "First Step into Speaking",
+      "description": "Learn how to ideate conference talk topics, structure and pitch your proposal, and understand how conference talks are selected in this session.",
+      "category": "social",
+      "date": "Thursday 19 March",
+      "time": "6–8pm",
+      "location": "Boardroom 124 J12 (CSB)",
+      "free_event": null,
+      "free_food": true,
+      "external_registration_link": null,
+      "is_event_like": true,
+      "confidence": 1
+    }
+  }
+]
