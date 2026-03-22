@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { type ReactNode } from "react";
 import { AppShell } from "@/components/app-shell";
 import { useSocieties } from "@/components/societies-context";
@@ -146,7 +147,10 @@ function FeaturedSocietyCard({
       <div className="border-b border-border/60 px-6 py-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex min-w-0 items-start gap-4">
-            <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-[1.35rem] border border-white/70 bg-white shadow-sm">
+            <Link
+              href={`/society/${encodeURIComponent(society.id)}`}
+              className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-[1.35rem] border border-white/70 bg-white shadow-sm"
+            >
               <Image
                 src={society.logo}
                 alt={society.name}
@@ -154,13 +158,15 @@ function FeaturedSocietyCard({
                 sizes="80px"
                 className="object-cover"
               />
-            </div>
+            </Link>
 
             <div className="min-w-0 flex-1 space-y-3">
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="break-words text-2xl font-semibold tracking-[-0.03em] text-foreground sm:text-3xl">
-                  {society.name}
-                </h2>
+                <Link href={`/society/${encodeURIComponent(society.id)}`}>
+                  <h2 className="break-words text-2xl font-semibold tracking-[-0.03em] text-foreground hover:text-primary sm:text-3xl">
+                    {society.name}
+                  </h2>
+                </Link>
                 <Badge variant="secondary" className="rounded-full">
                   {society.category}
                 </Badge>
@@ -251,7 +257,10 @@ function CompactSocietyRow({
     <div className="rounded-[1.35rem] border border-border/60 bg-background/80 p-4">
       <div className="flex items-start justify-between gap-4">
         <div className="flex min-w-0 items-start gap-3">
-          <div className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-[1rem] bg-muted">
+          <Link
+            href={`/society/${encodeURIComponent(society.id)}`}
+            className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-[1rem] bg-muted"
+          >
             <Image
               src={society.logo}
               alt={society.name}
@@ -259,9 +268,11 @@ function CompactSocietyRow({
               sizes="56px"
               className="object-cover"
             />
-          </div>
+          </Link>
           <div className="min-w-0">
-            <p className="truncate text-base font-semibold text-foreground">{society.name}</p>
+            <Link href={`/society/${encodeURIComponent(society.id)}`}>
+              <p className="truncate text-base font-semibold text-foreground hover:text-primary">{society.name}</p>
+            </Link>
             <p className="mt-1 text-sm text-muted-foreground">{society.description}</p>
             <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
               <span>{weeklyEventCount} events this week</span>

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { Calendar, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -34,7 +35,10 @@ export function SocietyCard({
         <div className={cn("flex h-full flex-col gap-5", compact && "gap-4")}>
           <div className="flex items-start justify-between gap-4">
             <div className="flex min-w-0 items-start gap-4">
-              <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-[1.1rem] bg-muted">
+              <Link
+                href={`/society/${encodeURIComponent(society.id)}`}
+                className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-[1.1rem] bg-muted"
+              >
                 <Image
                   src={society.logo}
                   alt={society.name}
@@ -42,13 +46,15 @@ export function SocietyCard({
                   sizes="64px"
                   className="object-cover"
                 />
-              </div>
+              </Link>
 
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="truncate text-xl font-semibold tracking-[-0.02em] text-foreground">
-                    {society.name}
-                  </h3>
+                  <Link href={`/society/${encodeURIComponent(society.id)}`}>
+                    <h3 className="truncate text-xl font-semibold tracking-[-0.02em] text-foreground hover:text-primary">
+                      {society.name}
+                    </h3>
+                  </Link>
                   <Badge variant="secondary" className="rounded-full">
                     {society.category}
                   </Badge>

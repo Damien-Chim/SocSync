@@ -102,7 +102,12 @@ export default async function EventDetailPage({
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/15 to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 p-6 text-white">
-                  <p className="text-sm text-white/80">{event.society.name}</p>
+                  <Link
+                    href={`/society/${encodeURIComponent(event.society.id)}`}
+                    className="text-sm text-white/80 hover:text-white"
+                  >
+                    {event.society.name}
+                  </Link>
                   <h1 className="mt-2 max-w-2xl text-4xl font-semibold tracking-[-0.04em]">
                     {event.title}
                   </h1>
