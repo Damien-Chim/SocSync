@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { type ReactNode, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { type ReactNode, useMemo, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { EventCard } from "@/components/event-card";
 import { SavedEventsProvider, useSavedEvents } from "@/components/saved-events-context";
@@ -10,15 +11,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { getScrapedEvents } from "@/lib/scraped-events";
 import { cn } from "@/lib/utils";
 import type { Event, EventCategory } from "@/lib/types";
-import { createClient } from "@/lib/supabase/client";
 import {
   ArrowUpRight,
   Bookmark,
   Calendar,
   Clock,
-  Loader2,
   MapPin,
   Search,
 } from "lucide-react";
@@ -31,35 +31,6 @@ export default function DashboardPage() {
   );
 }
 
-function mapDbEventToEvent(row: Record<string, unknown>): Event {
-  return {
-    id: row.id as string,
-    title: row.title as string,
-    description: (row.description as string) ?? "",
-    society: {
-      id: row.society_id as string,
-      name: (row.society_name as string) ?? "",
-      logo: (row.society_logo as string) ?? "",
-      category: (row.society_category as EventCategory) ?? "Tech",
-      description: "",
-      followerCount: 0,
-    },
-    date: row.date as string,
-    time: (row.time as string)?.slice(0, 5) ?? "",
-    location: (row.location as string) ?? "",
-    coordinates: {
-      lat: (row.latitude as number) ?? 0,
-      lng: (row.longitude as number) ?? 0,
-    },
-    price: row.price == null ? "Free" : Number(row.price),
-    hasFreeFood: (row.has_free_food as boolean) ?? false,
-    registrationLink: (row.registration_link as string) ?? "",
-    bannerImage: (row.banner_image_url as string) ?? "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=400&fit=crop",
-    category: (row.category as EventCategory) ?? "Tech",
-    saveCount: (row.save_count as number) ?? 0,
-  };
-}
-
 function getEventTimestamp(event: Event) {
   const time = event.time || "00:00";
   return new Date(`${event.date}T${time}`).getTime();
@@ -70,51 +41,28 @@ function getEventDateTimestamp(event: Event) {
 }
 
 function DashboardContent() {
-  const [allEvents, setAllEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<EventCategory[]>([]);
   const [freeFoodOnly, setFreeFoodOnly] = useState(false);
   const [freeEventsOnly, setFreeEventsOnly] = useState(false);
 
-  const supabase = useMemo(() => createClient(), []);
-
-  useEffect(() => {
-    async function loadEvents() {
-      const { data, error } = await supabase
-        .from("events_with_details")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.error("[Dashboard] Failed to load events:", error.message);
-      } else if (data) {
-        setAllEvents(data.map(mapDbEventToEvent));
-      }
-      setLoading(false);
-    }
-
-    loadEvents();
-  }, [supabase]);
-
-  const now = Date.now();
-
-  const futureEvents = useMemo(() => {
-    return allEvents.filter((event) => getEventTimestamp(event) >= now);
-  }, [allEvents, now]);
+  const allEvents = useMemo(
+    () => getScrapedEvents(),
+    []
+  );
 
   const featuredCandidates = useMemo(() => {
-    return [...futureEvents].sort((a, b) => {
+    return [...allEvents].sort((a, b) => {
       const dateDiff = getEventDateTimestamp(a) - getEventDateTimestamp(b);
       if (dateDiff !== 0) {
         return dateDiff;
       }
       return b.saveCount - a.saveCount;
     });
-  }, [futureEvents]);
+  }, [allEvents]);
 
   const freeEntriesByDate = useMemo(() => {
-    return [...futureEvents]
+    return [...allEvents]
       .filter((event) => event.price === "Free")
       .sort((a, b) => {
         const dateDiff = getEventDateTimestamp(a) - getEventDateTimestamp(b);
@@ -123,7 +71,7 @@ function DashboardContent() {
         }
         return b.saveCount - a.saveCount;
       });
-  }, [futureEvents]);
+  }, [allEvents]);
 
   const sortedByEventTime = useMemo(() => {
     return [...allEvents].sort((a, b) => {
@@ -133,10 +81,6 @@ function DashboardContent() {
 
   const filteredUpcomingEvents = useMemo(() => {
     return sortedByEventTime.filter((event) => {
-      if (getEventTimestamp(event) < now) {
-        return false;
-      }
-
       const normalizedQuery = searchQuery.trim().toLowerCase();
 
       if (
@@ -170,16 +114,6 @@ function DashboardContent() {
   const featuredEvent = featuredCandidates[0];
   const freeAndEasyEvents = freeEntriesByDate.slice(0, 3);
   const allUpcomingEvents = filteredUpcomingEvents;
-
-  if (loading) {
-    return (
-      <AppShell userRole="student">
-        <div className="flex items-center justify-center py-24">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
-      </AppShell>
-    );
-  }
 
   return (
     <AppShell userRole="student">
@@ -215,40 +149,42 @@ function DashboardContent() {
                 <div className="grid gap-0 lg:grid-cols-[1.15fr_0.85fr]">
                   <div className="p-4 pb-0 lg:p-4 lg:pr-0">
                     <div className="relative min-h-[18rem] overflow-hidden rounded-[1.6rem]">
-                      <Image
-                        src={featuredEvent.bannerImage}
-                        alt={featuredEvent.title}
-                        fill
-                        sizes="(max-width: 1024px) 100vw, 55vw"
-                        className="object-cover object-center"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-transparent" />
+                      <Link href={`/events/${encodeURIComponent(featuredEvent.id)}`}>
+                        <Image
+                          src={featuredEvent.bannerImage}
+                          alt={featuredEvent.title}
+                          fill
+                          sizes="(max-width: 1024px) 100vw, 55vw"
+                          className="object-cover object-center"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-transparent" />
+                        <div className="absolute inset-x-0 bottom-0 space-y-4 p-5 text-white">
+                          <div className="space-y-2">
+                            <p className="text-sm text-white/80">{featuredEvent.society.name}</p>
+                            <h2 className="max-w-xl text-3xl font-semibold tracking-[-0.03em]">
+                              {featuredEvent.title}
+                            </h2>
+                            <p className="max-w-lg text-sm leading-6 text-white/80">
+                              {featuredEvent.description}
+                            </p>
+                          </div>
+                          <div className="flex flex-wrap gap-5 text-sm text-white/85">
+                            <span className="flex items-center gap-2">
+                              <Calendar className="h-4 w-4" />
+                              {formatDate(featuredEvent.date)}
+                            </span>
+                            <span className="flex items-center gap-2">
+                              <Clock className="h-4 w-4" />
+                              {featuredEvent.time}
+                            </span>
+                            <span className="flex items-center gap-2">
+                              <MapPin className="h-4 w-4" />
+                              {featuredEvent.location}
+                            </span>
+                          </div>
+                        </div>
+                      </Link>
                       <FeaturedBookmark eventId={featuredEvent.id} />
-                      <div className="absolute inset-x-0 bottom-0 space-y-4 p-5 text-white">
-                        <div className="space-y-2">
-                          <p className="text-sm text-white/80">{featuredEvent.society.name}</p>
-                          <h2 className="max-w-xl text-3xl font-semibold tracking-[-0.03em]">
-                            {featuredEvent.title}
-                          </h2>
-                          <p className="max-w-lg text-sm leading-6 text-white/80">
-                            {featuredEvent.description}
-                          </p>
-                        </div>
-                        <div className="flex flex-wrap gap-5 text-sm text-white/85">
-                          <span className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4" />
-                            {formatDate(featuredEvent.date)}
-                          </span>
-                          <span className="flex items-center gap-2">
-                            <Clock className="h-4 w-4" />
-                            {featuredEvent.time}
-                          </span>
-                          <span className="flex items-center gap-2">
-                            <MapPin className="h-4 w-4" />
-                            {featuredEvent.location}
-                          </span>
-                        </div>
-                      </div>
                     </div>
                   </div>
 
@@ -287,14 +223,12 @@ function DashboardContent() {
                       </div>
                     </div>
 
-                    {featuredEvent.registrationLink && (
-                      <Button asChild className="mt-6 h-11 rounded-full px-5">
-                        <a href={featuredEvent.registrationLink} target="_blank" rel="noopener noreferrer">
-                          Open event
-                          <ArrowUpRight className="ml-2 h-4 w-4" />
-                        </a>
-                      </Button>
-                    )}
+                    <Button asChild className="mt-6 h-11 rounded-full px-5">
+                      <Link href={`/events/${encodeURIComponent(featuredEvent.id)}`}>
+                        Open event
+                        <ArrowUpRight className="ml-2 h-4 w-4" />
+                      </Link>
+                    </Button>
                   </CardContent>
                 </div>
               </Card>
@@ -397,7 +331,10 @@ function CompactEventRow({ event }: { event: Event }) {
   return (
     <div className="rounded-[1.4rem] border border-border/60 bg-background/80 p-3">
       <div className="flex items-start gap-3">
-        <div className="relative h-16 w-16 overflow-hidden rounded-2xl">
+        <Link
+          href={`/events/${encodeURIComponent(event.id)}`}
+          className="relative h-16 w-16 overflow-hidden rounded-2xl"
+        >
           <Image
             src={event.bannerImage}
             alt={event.title}
@@ -405,10 +342,14 @@ function CompactEventRow({ event }: { event: Event }) {
             sizes="64px"
             className="object-cover"
           />
-        </div>
+        </Link>
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-3">
-            <p className="truncate text-sm font-semibold text-foreground">{event.title}</p>
+            <Link href={`/events/${encodeURIComponent(event.id)}`} className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-foreground hover:text-primary">
+                {event.title}
+              </p>
+            </Link>
             <button
               onClick={() => toggleSave(event.id)}
               className={cn(
