@@ -14,6 +14,31 @@ import { createClient } from "@/lib/supabase/client";
 
 type UserRole = "student" | "host";
 
+function extractInstagramUsername(value: string) {
+  const trimmed = value.trim();
+
+  if (!trimmed) {
+    return null;
+  }
+
+  const withoutAt = trimmed.replace(/^@/, "");
+
+  if (!withoutAt.includes("instagram.com")) {
+    return withoutAt.split(/[/?#]/)[0] || null;
+  }
+
+  try {
+    const normalizedUrl = withoutAt.startsWith("http")
+      ? withoutAt
+      : `https://${withoutAt}`;
+    const url = new URL(normalizedUrl);
+    const [username] = url.pathname.split("/").filter(Boolean);
+    return username || null;
+  } catch {
+    return null;
+  }
+}
+
 export default function SignupPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
@@ -60,6 +85,17 @@ export default function SignupPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    const instagramUsername =
+      role === "host" && formData.instagramLink.trim()
+        ? extractInstagramUsername(formData.instagramLink)
+        : null;
+
+    if (role === "host" && formData.instagramLink.trim() && !instagramUsername) {
+      setError("Please enter a valid Instagram username or link.");
+      setLoading(false);
+      return;
+    }
 
     const supabase = createClient();
 
@@ -130,6 +166,25 @@ export default function SignupPage() {
             .from("societies")
             .update(updates)
             .eq("id", profile.society_id);
+        }
+      }
+
+      if (instagramUsername) {
+        try {
+          const response = await fetch("/api/scrape-instagram", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ username: instagramUsername }),
+          });
+
+          if (!response.ok) {
+            const payload = await response.json().catch(() => null);
+            console.error("[Signup] Scraper trigger failed:", payload?.error ?? response.statusText);
+          }
+        } catch (scrapeError) {
+          console.error("[Signup] Scraper trigger failed:", scrapeError);
         }
       }
     }

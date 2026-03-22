@@ -1,117 +1,66 @@
 [
   {
-    "source_url": "https://www.instagram.com/syncsusyd/p/DVBL25ckeUa/",
-    "source_caption": "syncsusyd 4 w INTRODUCING YOUR 2026–2027 SYNCS TOP 4 AND EVENT DIRECTORS🫡 Tim & Jeff leading 💪🧑‍🍳, Robin keeping it tight 🎀, Angela guarding the budget 💸 Plus our AMAZING Tech (Hanna & Daniel) and Social (Vivian & Aaron) Events execs making it all happen behind the scenes. WELCOME Top 4 and Event Coordinators 💙",
+    "source_url": "https://www.instagram.com/usydchocsoc/p/DNmj6KPSzUL/",
+    "source_caption": "usydchocsoc 30w CHOCOHOLICS! WANT SOME AMAZING DISCOUNTS? 💸 🤑 Here's our sponsorships for 2025! 😍 We've finally received our NEW membership cards - so make sure to come by our future events to collect your very own card!* 💳 🍫 Finally, a huge thank you to our friends for making this happen! @bloomacarons @bubbleninitea @butterleaf.life @dulcitodesserts @fresh_and_hot_malatang @hendryscoffee @kkini_pocha @mochiric @salspizzaaus @tanghulu_sydney @topimpressionbakery Psst! Make sure to check out each sponsor's individual IG post for the specifics on the partnership 😎 📲 *Must be apart of our $5 annual USU membership! Join with link in bio! ✍️ #usyd #universityofsydney #sydney #university #unilife #society",
     "event": {
-      "event_title": "Introducing Your 2026–2027 Syncs Top 4 and Event Directors",
-      "description": "A post introducing the leadership team for 2026–2027, highlighting top executives and event coordinators for both tech and social events.",
+      "event_title": "CHOCOHOLICS Sponsorships for 2025",
+      "description": "The post announces sponsorships for 2025 and the arrival of new membership cards, encouraging members to visit future events to collect their card and take advantage of amazing discounts from partnered sponsors. Membership requires a $5 annual USU fee.",
       "category": "social",
       "date": null,
       "time": null,
       "location": null,
       "free_event": null,
-      "free_food": false,
-      "external_registration_link": null,
-      "is_event_like": false,
-      "confidence": 1
-    }
-  },
-  {
-    "source_url": "https://www.instagram.com/syncsusyd/p/DVBLgTPEcSI/",
-    "source_caption": "syncsusyd 4 w INTRODUCING YOUR 2026–2027 SYNCS INDUSTRY & PR TEAMS 🫡 Rebecca, Kerris & Hadi leading Industry 🤝💼 Cynthia, Melissa, Chloe & Daniel shaping PR 📸📝 From the very partnerships you see to the posts you double tap… WELCOME Industry & PR 💙",
-    "event": {
-      "event_title": "INTRODUCING YOUR 2026–2027 SYNCS INDUSTRY & PR TEAMS",
-      "description": "An announcement introducing the new Industry and PR teams with Rebecca, Kerris, & Hadi leading Industry and Cynthia, Melissa, Chloe & Daniel shaping PR.",
-      "category": "industry",
-      "date": null,
-      "time": null,
-      "location": null,
-      "free_event": null,
-      "free_food": false,
-      "external_registration_link": null,
-      "is_event_like": false,
-      "confidence": 1
-    }
-  },
-  {
-    "source_url": "https://www.instagram.com/syncsusyd/p/DVBLJwzEfWX/",
-    "source_caption": "syncsusyd Edited • 4 w INTRODUCING YOUR 2026–2027 SYNCS DEVS & REPS 🫡 Vincent, Hugo & Nikhil building systems 💻⚙️ Damien, Richard, Daniel, Robin & Anushka representing the cohort 🎤📣 The voices at the front, and the coding in the back 🎉 Please give a warm WELCOME to our Devs & Reps 💙",
-    "event": {
-      "event_title": "Introducing Your 2026–2027 Syncs Devs & Reps",
-      "description": "A social media announcement introducing the new Syncs Devs & Reps team, featuring Vincent, Hugo & Nikhil for systems building and Damien, Richard, Daniel, Robin & Anushka representing the cohort.",
-      "category": "social",
-      "date": null,
-      "time": null,
-      "location": null,
-      "free_event": null,
-      "free_food": false,
+      "free_food": null,
       "external_registration_link": null,
       "is_event_like": false,
       "confidence": 0.9
     }
   },
   {
-    "source_url": "https://www.instagram.com/syncsusyd/p/DWJUt02EYKo/",
-    "source_caption": "syncsusyd 16 h What if robots could see, think, and act in the real world just like humans? 🤖 Join us as Dr. William Zhi dives into Embodied AI where robots learn from humans and operate beyond controlled settings. 🧠 Learn how robots pick up skills from just a few demonstrations 🌍 Adapt to new, unpredictable environments ⚙️ And leverage foundation models to improve perception 📅 26 March (Week 5) ⏰ 6–8PM 📍 Boardroom 124, J12 (CSB) 🍕 PEP hours + free food included Perfect for anyone interested in AI, robotics, or the future of intelligent systems. #SYNCS #USYD #EmbodiedAI #Robotics",
+    "source_url": "https://www.instagram.com/usydchocsoc/p/DWDNjibEYsw/",
+    "source_caption": "usydchocsoc Edited • 3d ‼️WHATS UP CHOCOHOLICS‼️ Need a break from uni 📚? Assignments got you feeling meltdown mode ✏️? Come dip into happiness at our chocolate fountain next week 🍫! Psa: we’ve got LOADSSSS OF TOPPINGS (rumours says there’s strawberries 🍓 , bananas 🍌 , pretzels 🥨 , rice bubbles and more… 🤫👀) First come, First serve, before the fountain runs dry🏜️🍫 !! 🗓️ Date: 26th March ⏰ Time: 2:30- 4pm 📍Location: ISL timber floors 💰 COST 💰: Members + USU = FREE Non-Member + USU = Only $2 Non-Member/Non-USU = $5 #usyd #universityofsydney #unilife #chocolate",
     "event": {
-      "event_title": "Embodied AI with Dr. William Zhi",
-      "description": "Dr. William Zhi explores how robots learn from human demonstrations, adapt to unpredictable environments, and leverage foundation models to enhance perception in uncontrolled settings.",
-      "category": "tech",
-      "date": "26 March",
-      "time": "6–8PM",
-      "location": "Boardroom 124, J12 (CSB)",
-      "free_event": null,
-      "free_food": true,
-      "external_registration_link": null,
-      "is_event_like": true,
-      "confidence": 1.0
-    }
-  },
-  {
-    "source_url": "https://www.instagram.com/usydsuams/p/DWGICCKD8-2/",
-    "source_caption": "1. Be a member of both SUAMS & SYNCS (it’s free!) 2. Follow both our Instagram accounts @usydsuams @syncsusyd 3. Tag a friend in the comments That’s it. Free memberships, free entry, and you could walk away with an AirPods 4, Air Fryer or a $100 Cole’s Gift Card 🙈 What are you waiting for !?? 🔗 Links in bio to sign up to both socs. ⏰ Giveaway closes 22nd March — tag someone NOW and get them in on it.",
-    "event": {
-      "event_title": null,
-      "description": "Follow the instructions to become a member of both SUAMS & SYNCS for free, tag a friend, and enter a giveaway for prizes including AirPods 4, an Air Fryer, or a $100 Cole’s Gift Card. The giveaway closes on 22nd March.",
+      "event_title": "Chocolate Fountain",
+      "description": "Take a break from uni and enjoy a chocolate fountain with an assortment of toppings, including strawberries, bananas, pretzels, and rice bubbles. The event is held at ISL timber floors and has different costs based on membership status.",
       "category": "social",
-      "date": "22nd March",
-      "time": null,
-      "location": null,
-      "free_event": true,
+      "date": "26th March",
+      "time": "2:30-4pm",
+      "location": "ISL timber floors",
+      "free_event": null,
       "free_food": false,
       "external_registration_link": null,
       "is_event_like": true,
-      "confidence": 1.0
+      "confidence": 1
     }
   },
   {
-    "source_url": "https://www.instagram.com/syncsusyd/p/DWFKHEgk78Y/",
-    "source_caption": "syncsusyd 2 d Are you CURIOUS about our weekly events 👀 (we know you are)… Join us every WEDNESDAY & THURSDAY for: 💻 Leetcoding Club 🎲 Social Nights 🌭 Weekly BBQ 🎤 Tech Talks Here at SYNCS, we have a great mix of tech, industry and social events for YOU (yes you) to enjoy! Please feel free to drop by any of our events each week, we would love to see you there! P.S. free food is provided 😮‍💨",
+    "source_url": "https://www.instagram.com/usydchocsoc/p/DV0yolJETCh/",
+    "source_caption": "usydchocsoc 1w CHOCOHOLICS ITS TIME FOR TRIVIA ‼ 🎉🎊 Get ready to test your knowledge 🧠 , challenge your friends 👬, and enjoy a night full of laughs, friendly competition, and great vibes! 🏆✨ Whether you’re a trivia master or just coming for the fun, it’s the perfect way to break up your week! Just swing by Suwak SR 225 with your friends or join a team when you arrive! Stick around, meet new people, and see if your team has what it takes to take the win! 🤔📚 Bring your friends, bring your brainpower, and get ready for a night of trivia, laughs, and bragging rights! 🎤🏆🧠 Signups here: https://bit.ly/4urQ4ll 🗓️ Date: Friday 20th March ⏰ Time: 5:00pm - 8:00pm 📍 Location: Susan Wakil Seminar Room 225 💰 COST 💰 Members + USU = FREE Non-Member + USU = Only $2 Non-Member/Non-USU = $5",
     "event": {
-      "event_title": "Weekly Events at SYNCS",
-      "description": "SYNCS hosts weekly events every Wednesday and Thursday, featuring Leetcoding Club, Social Nights, Weekly BBQ, and Tech Talks. Free food is provided and everyone is welcome to drop by any event each week.",
+      "event_title": "CHOCOHOLICS Trivia Night",
+      "description": "Get ready to test your knowledge and enjoy a night of friendly competition and socialising at the CHOCOHOLICS Trivia event. Bring your friends, join a team or sign up on arrival, and compete for bragging rights.",
       "category": "social",
-      "date": "Every Wednesday & Thursday",
-      "time": null,
-      "location": null,
-      "free_event": null,
-      "free_food": true,
-      "external_registration_link": null,
+      "date": "Friday 20th March",
+      "time": "5:00pm - 8:00pm",
+      "location": "Susan Wakil Seminar Room 225",
+      "free_event": false,
+      "free_food": null,
+      "external_registration_link": "https://bit.ly/4urQ4ll",
       "is_event_like": true,
       "confidence": 1.0
     }
   },
   {
-    "source_url": "https://www.instagram.com/syncsusyd/p/DV-Kj_pkeOT/",
-    "source_caption": "syncsusyd Edited • 5 d Scoop & Toast 🍨🍞 is HERE! Come grab a sweet treat ✨, meet some new friends, and take a break between classes 💙 📍 J12 Front Lawn ⏰ Thursday 19 March, 11:00AM–12:00PM",
+    "source_url": "https://www.instagram.com/usydchocsoc/p/DVcWKJvkg9d/",
+    "source_caption": "Friday 13th March ⏰ Time: 11:00am – 1:00pm 📍 Location: ISL 💰 COST 💰: Members + USU = FREE Non-Member + USU = $2 Non-Member/Non-USU = $4 See you there… don’t get fomo! 🍫💫 #usyd #universityofsydney #sydney #university #unilife",
     "event": {
-      "event_title": "Scoop & Toast",
-      "description": "A campus social event where participants can grab a sweet treat, meet new friends, and take a break between classes.",
+      "event_title": null,
+      "description": "Event on Friday 13th March at ISL from 11:00am to 1:00pm. Pricing: Members + USU are free, Non-Member + USU cost $2, and Non-Member/Non-USU cost $4.",
       "category": "social",
-      "date": "Thursday 19 March",
-      "time": "11:00AM–12:00PM",
-      "location": "J12 Front Lawn",
-      "free_event": null,
+      "date": "Friday 13th March",
+      "time": "11:00am – 1:00pm",
+      "location": "ISL",
+      "free_event": false,
       "free_food": null,
       "external_registration_link": null,
       "is_event_like": true,
@@ -119,54 +68,105 @@
     }
   },
   {
-    "source_url": "https://www.instagram.com/syncsusyd/p/DV9hixPE0gz/",
-    "source_caption": "syncsusyd Edited • 5 d Are you interested in getting more involved with SYNCS? Join us for our Semester 1 GM to hear about upcoming events, meet the team, and nominate yourself for leadership roles. Let your friends know and don’t miss YOUR chance this semester! 📅 Wed 25 March 📍 Boardroom 124, J12 CSB ⏰ 4:00PM-6:00PM 🚀 Open Roles - First Year Rep - Undergrad Rep - Postgrad Rep - International Rep - Diversity Rep Nominate yourself below: 👉 https://forms.gle/hFMSpE2K9KBP9QZ2A Check out the meeting agenda: 👉 https://docs.google.com/document/d/12JblNxMsai6-XLjSvvUeDkEYlCyHqRM6jkOvj3wZgt8/edit?usp=sharing",
+    "source_url": "https://www.instagram.com/usydchocsoc/p/DVa5NXWkcpL/",
+    "source_caption": "usydchocsoc 2w 📢CHOCSOC GOES TO MUDGEE !!! 🚗🍫 Wanna be on the next trip instead of just hearing about it 👀? Subcommittee applications close ‼️TOMORROW‼️Check our pinned post on instagram for more details, don’t miss out !! Love, Chocsoc ❤️🍫 #universityofsydney #usyd #unilife #roadtrip",
     "event": {
-      "event_title": "Semester 1 GM",
-      "description": "Join SYNCS for their Semester 1 General Meeting to learn about upcoming events, meet the team, and nominate yourself for leadership roles including First Year Rep, Undergrad Rep, Postgrad Rep, International Rep, and Diversity Rep.",
-      "category": "social",
-      "date": "Wed 25 March",
-      "time": "4:00PM-6:00PM",
-      "location": "Boardroom 124, J12 CSB",
-      "free_event": null,
-      "free_food": false,
-      "external_registration_link": "https://forms.gle/hFMSpE2K9KBP9QZ2A",
-      "is_event_like": true,
-      "confidence": 1.0
-    }
-  },
-  {
-    "source_url": "https://www.instagram.com/syncsusyd/p/DV7HvLOE-iG/",
-    "source_caption": "syncsusyd 6 d Another week, another STACK of SYNCS events 😮‍💨👏 Whether you’re: 🔗 battling LINKED LISTS 🥀 at Leetcoding Club 🍦 grabbing (free) ICE CREAM at Scoop & Toast 🧠 learning how to PITCH a conference talk 🤝 networking with industry at our 2026 ANNUAL INN …there’s something happening ALMOST EVERY DAY! Come say hi to our team and make some new friends at our events this week ✨",
-    "event": {
-      "event_title": "STACK of SYNCS events",
-      "description": "A week of diverse SYNCS events including battling Linked Lists at Leetcoding Club, enjoying free ice cream at Scoop & Toast, learning how to pitch a conference talk, and networking with industry at the 2026 Annual Inn. Come say hi to the team and make new friends!",
+      "event_title": "CHOCSOC GOES TO MUDGEE",
+      "description": "Chocsoc is organizing a trip to Mudgee and is inviting students to apply for a subcommittee position, with applications closing tomorrow. Check the pinned Instagram post for more details.",
       "category": "social",
       "date": null,
       "time": null,
-      "location": null,
+      "location": "MUDGEE",
       "free_event": null,
-      "free_food": true,
+      "free_food": null,
       "external_registration_link": null,
       "is_event_like": true,
-      "confidence": 0.95
+      "confidence": 0.9
     }
   },
   {
-    "source_url": "https://www.instagram.com/syncsusyd/p/DV5Xw-gERBn/",
-    "source_caption": "• Ideate conference talk topics • Structure and pitch your proposal • Understand how conference talks are selected Whether you’ve built something cool, researched a topic, or just want to share what you’re learning… this session will show you how to take the FIRST STEP into speaking. 📍 Boardroom 124 J12 (CSB) 🗓 Thursday 19 March 🕕 6–8pm 🍕 Free food + PEP hours",
+    "source_url": "https://www.instagram.com/usydchocsoc/p/DVV2mIkkp9c/",
+    "source_caption": "usydchocsoc 2w WHAT'S UP CHOCOHOLICS! 😤🗯️ What better way to start your Tuesday than with a FREE DONUT! 🍩🤑 This early week sweet treat is sure to make the rest of your day upbeat! 🙂‍↕️ 🎶 You don't even have to think about it, it's a no brainer to come!! 🤔🏃🏃‍♀️ No sign-up needed, just swing by ISL or stick around and have a chat with the sweetest students at USYD!! 🥰 Or show up to your tutorial in style, with your doughnut in hand, sure to make your classmates jealous! 📚🍽️ 🗓️ Date: Tuesday 3rd March ⏰ Time: 11:00am - 1:00pm 📍Location: International Student Lounge (Wentworth Building) 💰 COST 💰: Members + USU = FREE Non-Member + USU = Only $2 Non-Member/Non-USU = $5",
     "event": {
-      "event_title": "First Step into Speaking",
-      "description": "Learn how to ideate conference talk topics, structure and pitch your proposal, and understand how conference talks are selected in this session.",
+      "event_title": "Free Donut Treat",
+      "description": "Enjoy a delicious donut on Tuesday at the International Student Lounge. Members get a free donut, while non-members pay a small fee. No sign-up is required – just drop by and enjoy the treat!",
       "category": "social",
-      "date": "Thursday 19 March",
-      "time": "6–8pm",
-      "location": "Boardroom 124 J12 (CSB)",
+      "date": "Tuesday 3rd March",
+      "time": "11:00am - 1:00pm",
+      "location": "International Student Lounge (Wentworth Building)",
       "free_event": null,
       "free_food": true,
       "external_registration_link": null,
       "is_event_like": true,
       "confidence": 1
+    }
+  },
+  {
+    "source_url": "https://www.instagram.com/usydchocsoc/p/DVPVggxksxx/",
+    "source_caption": "usydchocsoc 3w Meet our 2026 Chocsoc President: Amo! Being a constant steady and reliable backbone for our society and members, Amo brings the swag and positive vibes✨, reminding us to just keep swimming 🤿🐟 even when we’re down. Besides joining chocsoc, our best decision is making you our President! We Amor you <3! Chocsoc President Amorino Tooongart! 💝🍫",
+    "event": {
+      "event_title": "Meet our 2026 Chocsoc President: Amo!",
+      "description": "Announcement introducing Amo as the new 2026 Chocsoc President, celebrating his reliability, positive vibes, and leadership.",
+      "category": "social",
+      "date": null,
+      "time": null,
+      "location": null,
+      "free_event": null,
+      "free_food": null,
+      "external_registration_link": null,
+      "is_event_like": false,
+      "confidence": 1.0
+    }
+  },
+  {
+    "source_url": "https://www.instagram.com/usydchocsoc/p/DVN9Zrzkbpi/",
+    "source_caption": "Max Ma! *still not an actual doctor… YET!",
+    "event": {
+      "event_title": null,
+      "description": null,
+      "category": null,
+      "date": null,
+      "time": null,
+      "location": null,
+      "free_event": null,
+      "free_food": null,
+      "external_registration_link": null,
+      "is_event_like": false,
+      "confidence": 0.0
+    }
+  },
+  {
+    "source_url": "https://www.instagram.com/usydchocsoc/p/DVNXBbLEVkk/",
+    "source_caption": "usydchocsoc Edited • 2w We’re not quite sure about undefeated in drinking 🍻… but we are sure that with Dhinesh, chocsoc is undefeatable💪! With a goofy laid back aura, he definitely has given us whiplash with how trustworthy and reliable he can come to be - half of our events wouldn’t be possible without Dhinesh! Kinder Joy? More like Chocsoc’s Joy! We welcome our Joy Kindler Dhinesh Ponnappan as our 2026 Vice President! 🤗",
+    "event": {
+      "event_title": "Welcome Vice President Dhinesh Ponnappan",
+      "description": "The post celebrates and welcomes Dhinesh Ponnappan as the 2026 Vice President of the society, highlighting his trusted nature and contributions to past events.",
+      "category": "social",
+      "date": null,
+      "time": null,
+      "location": null,
+      "free_event": null,
+      "free_food": null,
+      "external_registration_link": null,
+      "is_event_like": false,
+      "confidence": 0.9
+    }
+  },
+  {
+    "source_url": "https://www.instagram.com/usydchocsoc/p/DVMzcI5kl14/",
+    "source_caption": "usydchocsoc 3w Whittaker… risk taker… mood maker 😝. If we had a penny for every time Allison had showed up and supported Chocsoc, we might be free of our debt! Just spending time with Allison heals the tit and tats we suffer through the academic semester 🥺💖. I know my life could hit the ‘sweet max’ 🍫 with a little bit of Chocsoc’s 2026 Secretary in it… Allison Liu!",
+    "event": {
+      "event_title": null,
+      "description": "A post praising Allison Liu for her consistent support of USyd Chocsoc and celebrating her potential role as the 2026 Secretary, highlighting the positive impact she has during the academic semester.",
+      "category": null,
+      "date": null,
+      "time": null,
+      "location": null,
+      "free_event": null,
+      "free_food": false,
+      "external_registration_link": null,
+      "is_event_like": false,
+      "confidence": 1.0
     }
   }
 ]
