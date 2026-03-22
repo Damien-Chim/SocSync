@@ -1,8 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { EventCard } from "@/components/event-card";
 import { SavedEventsProvider, useSavedEvents } from "@/components/saved-events-context";
@@ -87,12 +86,12 @@ function getEventDateTimestamp(event: Event) {
 }
 
 function DashboardContent() {
+  const [allEvents, setAllEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<EventCategory[]>([]);
   const [freeFoodOnly, setFreeFoodOnly] = useState(false);
   const [freeEventsOnly, setFreeEventsOnly] = useState(false);
-  const [allEvents, setAllEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
 
   const supabase = useMemo(() => createClient(), []);
 
@@ -203,13 +202,18 @@ function DashboardContent() {
   const freeAndEasyEvents = freeEntriesByDate.slice(0, 3);
   const allUpcomingEvents = filteredUpcomingEvents;
 
-  return (
-    <AppShell userRole="student">
-      {loading ? (
-        <div className="flex items-center justify-center py-16">
+  if (loading) {
+    return (
+      <AppShell userRole="student">
+        <div className="flex items-center justify-center py-24">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
-      ) : (
+      </AppShell>
+    );
+  }
+
+  return (
+    <AppShell userRole="student">
       <div className="space-y-8">
         <section className="overflow-hidden rounded-[2rem] border border-border/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(250,246,255,0.9)_45%,rgba(255,243,228,0.92))] shadow-[0_24px_80px_rgba(24,24,27,0.08)]">
           <div className="px-6 py-7 lg:px-8">
@@ -242,42 +246,40 @@ function DashboardContent() {
                 <div className="grid gap-0 lg:grid-cols-[1.15fr_0.85fr]">
                   <div className="p-4 pb-0 lg:p-4 lg:pr-0">
                     <div className="relative min-h-[18rem] overflow-hidden rounded-[1.6rem]">
-                      <Link href={`/events/${encodeURIComponent(featuredEvent.id)}`}>
-                        <Image
-                          src={featuredEvent.bannerImage}
-                          alt={featuredEvent.title}
-                          fill
-                          sizes="(max-width: 1024px) 100vw, 55vw"
-                          className="object-cover object-center"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-transparent" />
-                        <div className="absolute inset-x-0 bottom-0 space-y-4 p-5 text-white">
-                          <div className="space-y-2">
-                            <p className="text-sm text-white/80">{featuredEvent.society.name}</p>
-                            <h2 className="max-w-xl text-3xl font-semibold tracking-[-0.03em]">
-                              {featuredEvent.title}
-                            </h2>
-                            <p className="max-w-lg text-sm leading-6 text-white/80">
-                              {featuredEvent.description}
-                            </p>
-                          </div>
-                          <div className="flex flex-wrap gap-5 text-sm text-white/85">
-                            <span className="flex items-center gap-2">
-                              <Calendar className="h-4 w-4" />
-                              {formatDate(featuredEvent.date)}
-                            </span>
-                            <span className="flex items-center gap-2">
-                              <Clock className="h-4 w-4" />
-                              {featuredEvent.time}
-                            </span>
-                            <span className="flex items-center gap-2">
-                              <MapPin className="h-4 w-4" />
-                              {featuredEvent.location}
-                            </span>
-                          </div>
-                        </div>
-                      </Link>
+                      <Image
+                        src={featuredEvent.bannerImage}
+                        alt={featuredEvent.title}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 55vw"
+                        className="object-cover object-center"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-transparent" />
                       <FeaturedBookmark eventId={featuredEvent.id} />
+                      <div className="absolute inset-x-0 bottom-0 space-y-4 p-5 text-white">
+                        <div className="space-y-2">
+                          <p className="text-sm text-white/80">{featuredEvent.society.name}</p>
+                          <h2 className="max-w-xl text-3xl font-semibold tracking-[-0.03em]">
+                            {featuredEvent.title}
+                          </h2>
+                          <p className="max-w-lg text-sm leading-6 text-white/80">
+                            {featuredEvent.description}
+                          </p>
+                        </div>
+                        <div className="flex flex-wrap gap-5 text-sm text-white/85">
+                          <span className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4" />
+                            {formatDate(featuredEvent.date)}
+                          </span>
+                          <span className="flex items-center gap-2">
+                            <Clock className="h-4 w-4" />
+                            {featuredEvent.time}
+                          </span>
+                          <span className="flex items-center gap-2">
+                            <MapPin className="h-4 w-4" />
+                            {featuredEvent.location}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -316,12 +318,14 @@ function DashboardContent() {
                       </div>
                     </div>
 
-                    <Button asChild className="mt-6 h-11 rounded-full px-5">
-                      <Link href={`/events/${encodeURIComponent(featuredEvent.id)}`}>
-                        Open event
-                        <ArrowUpRight className="ml-2 h-4 w-4" />
-                      </Link>
-                    </Button>
+                    {featuredEvent.registrationLink && (
+                      <Button asChild className="mt-6 h-11 rounded-full px-5">
+                        <a href={featuredEvent.registrationLink} target="_blank" rel="noopener noreferrer">
+                          Open event
+                          <ArrowUpRight className="ml-2 h-4 w-4" />
+                        </a>
+                      </Button>
+                    )}
                   </CardContent>
                 </div>
               </Card>
@@ -413,7 +417,6 @@ function DashboardContent() {
           </div>
         )}
       </div>
-      )}
     </AppShell>
   );
 }
@@ -425,10 +428,7 @@ function CompactEventRow({ event }: { event: Event }) {
   return (
     <div className="rounded-[1.4rem] border border-border/60 bg-background/80 p-3">
       <div className="flex items-start gap-3">
-        <Link
-          href={`/events/${encodeURIComponent(event.id)}`}
-          className="relative h-16 w-16 overflow-hidden rounded-2xl"
-        >
+        <div className="relative h-16 w-16 overflow-hidden rounded-2xl">
           <Image
             src={event.bannerImage}
             alt={event.title}
@@ -436,14 +436,10 @@ function CompactEventRow({ event }: { event: Event }) {
             sizes="64px"
             className="object-cover"
           />
-        </Link>
+        </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-3">
-            <Link href={`/events/${encodeURIComponent(event.id)}`} className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold text-foreground hover:text-primary">
-                {event.title}
-              </p>
-            </Link>
+            <p className="truncate text-sm font-semibold text-foreground">{event.title}</p>
             <button
               onClick={() => toggleSave(event.id)}
               className={cn(

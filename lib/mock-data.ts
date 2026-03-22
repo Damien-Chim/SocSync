@@ -4,7 +4,7 @@ export const mockSocieties: Society[] = [
   {
     id: 'a1b2c3d4-0001-4000-8000-000000000001',
     name: 'Tech Society',
-    logo: 'https://api.dicebear.com/7.x/shapes/svg?seed=tech&backgroundColor=7c3aed',
+    logo: 'https://api.dicebear.com/7.x/shapes/svg?seed=tech&backgroundColor=7c2d12',
     category: 'Tech',
     description: 'Building the future, one hackathon at a time.',
     followerCount: 1234,

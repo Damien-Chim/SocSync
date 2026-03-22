@@ -54,7 +54,8 @@ const mapOptions: google.maps.MapOptions = {
 };
 
 function createMarkerIcon(event: Event): string {
-  const color = event.hasFreeFood ? "%23f59e0b" : "%237c3aed";
+  /* Terracotta primary + amber — aligned with app theme (no purple markers) */
+  const color = event.hasFreeFood ? "%23f59e0b" : "%237c2d12";
   const label = event.price === "Free" ? "F" : "$";
   return `data:image/svg+xml,${encodeURIComponent(`
     <svg xmlns="http://www.w3.org/2000/svg" width="40" height="50" viewBox="0 0 40 50">

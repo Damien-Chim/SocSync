@@ -1,8 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
-import { Calendar, Clock, MapPin, Bookmark, ArrowUpRight, UtensilsCrossed } from "lucide-react";
+import { Calendar, Clock, MapPin, Bookmark, ExternalLink, UtensilsCrossed } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -30,50 +29,33 @@ export function EventCard({ event }: EventCardProps) {
   return (
     <Card className="group overflow-hidden border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-300">
       <div className="relative aspect-[16/9] sm:aspect-[2/1] overflow-hidden">
-        <Link href={`/events/${encodeURIComponent(event.id)}`}>
-          <Image
-            src={event.bannerImage}
-            alt={event.title}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover w-auto h-auto transition-transform duration-300 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-
-          <div className="absolute top-3 left-3 flex flex-wrap gap-2">
-            <Badge
-              className={cn(
-                "font-semibold",
-                event.price === "Free"
-                  ? "bg-emerald-500 text-white hover:bg-emerald-600"
-                  : "bg-accent text-accent-foreground hover:bg-accent/90"
-              )}
-            >
-              {event.price === "Free" ? "Free" : `$${event.price}`}
-            </Badge>
-            {event.hasFreeFood && (
-              <Badge className="bg-amber-500 text-white hover:bg-amber-600 font-semibold">
-                <UtensilsCrossed className="h-3 w-3 mr-1" />
-                Free Food
-              </Badge>
+        <Image
+          src={event.bannerImage}
+          alt={event.title}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          className="object-cover w-auto h-auto transition-transform duration-300 group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        
+        <div className="absolute top-3 left-3 flex flex-wrap gap-2">
+          <Badge 
+            className={cn(
+              "font-semibold",
+              event.price === "Free" 
+                ? "bg-emerald-500 text-white hover:bg-emerald-600" 
+                : "bg-accent text-accent-foreground hover:bg-accent/90"
             )}
-          </div>
-
-          <div className="absolute bottom-3 left-3 flex items-center gap-2">
-            <div className="relative w-7 h-7 flex-shrink-0">
-              <Image
-                src={event.society.logo}
-                alt={event.society.name}
-                fill
-                sizes="28px"
-                className="rounded-full bg-white object-cover"
-              />
-            </div>
-            <span className="text-sm font-medium text-white drop-shadow-md">
-              {event.society.name}
-            </span>
-          </div>
-        </Link>
+          >
+            {event.price === "Free" ? "Free" : `$${event.price}`}
+          </Badge>
+          {event.hasFreeFood && (
+            <Badge className="bg-amber-500 text-white hover:bg-amber-600 font-semibold">
+              <UtensilsCrossed className="h-3 w-3 mr-1" />
+              Free Food
+            </Badge>
+          )}
+        </div>
 
         <button
           onClick={() => toggleSave(event.id)}
@@ -86,6 +68,21 @@ export function EventCard({ event }: EventCardProps) {
         >
           <Bookmark className={cn("h-4 w-4", saved && "fill-current")} />
         </button>
+
+        <div className="absolute bottom-3 left-3 flex items-center gap-2">
+          <div className="relative w-7 h-7 flex-shrink-0">
+            <Image
+              src={event.society.logo}
+              alt={event.society.name}
+              fill
+              sizes="28px"
+              className="rounded-full bg-white object-cover"
+            />
+          </div>
+          <span className="text-sm font-medium text-white drop-shadow-md">
+            {event.society.name}
+          </span>
+        </div>
       </div>
 
       <CardContent className="p-4">
@@ -93,11 +90,9 @@ export function EventCard({ event }: EventCardProps) {
           {event.category}
         </Badge>
 
-        <Link href={`/events/${encodeURIComponent(event.id)}`}>
-          <h3 className="mb-3 line-clamp-2 font-semibold text-foreground transition-colors group-hover:text-primary">
-            {event.title}
-          </h3>
-        </Link>
+        <h3 className="font-semibold text-foreground line-clamp-2 mb-3 group-hover:text-primary transition-colors">
+          {event.title}
+        </h3>
 
         <div className="space-y-1.5 mb-4">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -116,10 +111,10 @@ export function EventCard({ event }: EventCardProps) {
           asChild 
           className="w-full bg-primary hover:bg-primary/90 font-medium"
         >
-          <Link href={`/events/${encodeURIComponent(event.id)}`}>
-            View details
-            <ArrowUpRight className="ml-2 h-4 w-4" />
-          </Link>
+          <a href={event.registrationLink} target="_blank" rel="noopener noreferrer">
+            Register
+            <ExternalLink className="ml-2 h-4 w-4" />
+          </a>
         </Button>
       </CardContent>
     </Card>

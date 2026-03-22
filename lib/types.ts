@@ -28,8 +28,6 @@ export interface Event {
   id: string;
   title: string;
   description: string;
-  sourceCaption?: string;
-  sourceUrl?: string;
   society: Society;
   date: string;
   time: string;
