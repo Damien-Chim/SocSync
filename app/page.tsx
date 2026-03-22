@@ -1,17 +1,18 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { Zap, ArrowRight, Calendar, Users, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 lg:px-12">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.12),transparent_34%),radial-gradient(circle_at_85%_20%,rgba(249,115,22,0.10),transparent_26%),linear-gradient(180deg,#fcfcff_0%,#f8f8fd_48%,#fcfbf8_100%)]">
+      <header className="px-6 py-5 lg:px-12">
+        <div className="mx-auto flex max-w-6xl items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary">
             <Zap className="h-6 w-6 text-primary-foreground" />
           </div>
-          <span className="text-xl font-bold text-foreground">SocSync</span>
+          <span className="text-xl font-semibold tracking-[-0.03em] text-foreground">SocSync</span>
         </div>
         <div className="flex items-center gap-3">
           <Link href="/login">
@@ -20,87 +21,69 @@ export default function HomePage() {
             </Button>
           </Link>
           <Link href="/signup">
-            <Button className="bg-primary hover:bg-primary/90 font-medium">
+            <Button className="rounded-full bg-primary px-6 font-medium hover:bg-primary/90">
               Get Started
             </Button>
           </Link>
         </div>
+        </div>
       </header>
 
-      {/* Hero Section */}
       <main className="px-6 lg:px-12">
-        <div className="mx-auto max-w-5xl pt-20 pb-16 text-center">
-          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary mb-6">
-            <Zap className="h-4 w-4" />
-            Your Campus Event Hub
-          </div>
-          
-          <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-6xl lg:text-7xl text-balance">
-            Discover Events.
-            <br />
-            <span className="text-primary">Connect</span> with{" "}
-            <span className="text-accent">Societies.</span>
-          </h1>
-          
-          <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto text-pretty">
-            SocSync is your one-stop platform to discover university society events, 
-            connect with like-minded students, and never miss out on campus life.
-          </p>
+        <section className="mx-auto max-w-6xl pt-18 pb-18 lg:pt-24 lg:pb-24">
+          <div className="max-w-4xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+              Your campus event hub
+            </p>
 
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/signup">
-              <Button size="lg" className="h-12 px-8 text-base font-semibold bg-primary hover:bg-primary/90 shadow-lg shadow-primary/30">
-                Start Exploring
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-            <Link href="/login">
-              <Button size="lg" variant="outline" className="h-12 px-8 text-base font-semibold">
-                I&apos;m a Society Host
-              </Button>
-            </Link>
-          </div>
-        </div>
+            <h1 className="mt-6 text-5xl font-semibold tracking-[-0.06em] text-foreground sm:text-6xl lg:text-[6.2rem] lg:leading-[0.96]">
+              Discover events.
+              <br />
+              Connect with societies.
+            </h1>
 
-        {/* Features Grid */}
-        <div className="mx-auto max-w-5xl pb-20">
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="group p-6 rounded-2xl bg-card border border-border shadow-sm hover:shadow-lg hover:border-primary/30 transition-all duration-300">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                <Calendar className="h-6 w-6" />
-              </div>
-              <h3 className="text-lg font-semibold text-foreground mb-2">Browse Events</h3>
-              <p className="text-sm text-muted-foreground">
-                Filter by category, date, free food availability, and more. Find your perfect event in seconds.
-              </p>
-            </div>
+            <p className="mt-8 max-w-2xl text-xl leading-9 text-muted-foreground">
+              SocSync helps students find what is actually happening on campus, follow the right societies, and stop missing the events everyone talks about after they are over.
+            </p>
 
-            <div className="group p-6 rounded-2xl bg-card border border-border shadow-sm hover:shadow-lg hover:border-accent/30 transition-all duration-300">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10 text-accent-foreground mb-4 group-hover:bg-accent group-hover:text-accent-foreground transition-colors">
-                <MapPin className="h-6 w-6" />
-              </div>
-              <h3 className="text-lg font-semibold text-foreground mb-2">Map View</h3>
-              <p className="text-sm text-muted-foreground">
-                See all events on an interactive campus map. Never get lost finding your next adventure.
-              </p>
-            </div>
-
-            <div className="group p-6 rounded-2xl bg-card border border-border shadow-sm hover:shadow-lg hover:border-primary/30 transition-all duration-300">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                <Users className="h-6 w-6" />
-              </div>
-              <h3 className="text-lg font-semibold text-foreground mb-2">Follow Societies</h3>
-              <p className="text-sm text-muted-foreground">
-                Get notified when your favorite societies post new events. Build your community.
-              </p>
+            <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+              <Link href="/signup">
+                <Button size="lg" className="h-12 rounded-full px-8 text-base font-semibold">
+                  Start exploring
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+              <Link
+                href="/login"
+                className="inline-flex items-center text-base font-medium text-foreground transition-colors hover:text-primary"
+              >
+                I&apos;m a society host
+              </Link>
             </div>
           </div>
-        </div>
+
+          <div className="mt-20 grid gap-10 border-t border-border/60 pt-10 md:grid-cols-3">
+            <FeatureColumn
+              icon={<Calendar className="h-5 w-5" />}
+              title="Browse events"
+              description="Find the next thing worth leaving your room for, without digging through five group chats and twelve stories."
+            />
+            <FeatureColumn
+              icon={<MapPin className="h-5 w-5" />}
+              title="See what is nearby"
+              description="Use the map to understand where events are actually happening and whether getting there is realistic."
+            />
+            <FeatureColumn
+              icon={<Users className="h-5 w-5" />}
+              title="Keep up with societies"
+              description="Follow the groups that match your interests and get a cleaner feed instead of random campus noise."
+            />
+          </div>
+        </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-border px-6 py-8 lg:px-12">
-        <div className="mx-auto max-w-5xl flex flex-col sm:flex-row items-center justify-between gap-4">
+      <footer className="border-t border-border/60 px-6 py-8 lg:px-12">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:flex-row">
           <div className="flex items-center gap-2">
             <Zap className="h-5 w-5 text-primary" />
             <span className="text-sm font-medium text-muted-foreground">
@@ -117,6 +100,28 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+    </div>
+  );
+}
+
+function FeatureColumn({
+  icon,
+  title,
+  description,
+}: {
+  icon: ReactNode;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="space-y-4">
+      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/80 text-primary shadow-sm ring-1 ring-border/60">
+        {icon}
+      </div>
+      <div className="space-y-2">
+        <h2 className="text-2xl font-semibold tracking-[-0.03em] text-foreground">{title}</h2>
+        <p className="text-base leading-7 text-muted-foreground">{description}</p>
+      </div>
     </div>
   );
 }
