@@ -64,6 +64,8 @@ export function SocietiesProvider({ children }: { children: ReactNode }) {
             category: s.category as EventCategory,
             description: s.description ?? "",
             followerCount: s.follower_count ?? 0,
+            createdAt:
+              typeof s.created_at === "string" ? s.created_at : undefined,
           }))
         );
         const counts: Record<string, number> = {};

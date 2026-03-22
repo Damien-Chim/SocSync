@@ -27,16 +27,20 @@ function SocietiesLayoutContent({
 }: {
   children: ReactNode;
 }) {
-  const { societies, followedIds, toggleFollow, eventCounts, weeklyEventCounts } = useSocieties();
+  const { societies, followedIds, toggleFollow, eventCounts, weeklyEventCounts, loading } =
+    useSocieties();
   const followedSocieties = societies.filter((society) => followedIds.includes(society.id));
   const preferredCategories = new Set(followedSocieties.map((society) => society.category));
-  const recommendedSocieties = societies.filter(
-    (society) =>
-      !followedIds.includes(society.id) &&
-      (preferredCategories.size === 0 || preferredCategories.has(society.category))
-  );
+
+  const unfollowedSocieties = societies.filter((s) => !followedIds.includes(s.id));
   const popularSocieties = [...societies].sort((a, b) => b.followerCount - a.followerCount);
-  const featuredSociety = recommendedSocieties[0] ?? popularSocieties[0];
+
+  const featuredSociety =
+    [...unfollowedSocieties].sort((a, b) => {
+      const ta = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const tb = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return tb - ta;
+    })[0] ?? popularSocieties[0];
   const trendingThisWeek = [...societies]
     .filter((society) => society.id !== featuredSociety?.id)
     .sort((a, b) => {
@@ -46,8 +50,10 @@ function SocietiesLayoutContent({
     })
     .slice(0, 3);
   const recommendationReason =
-    preferredCategories.size > 0
-      ? `Matches the categories you already follow: ${Array.from(preferredCategories).join(", ")}.`
+    featuredSociety && preferredCategories.size > 0
+      ? preferredCategories.has(featuredSociety.category)
+        ? `Matches the categories you already follow: ${Array.from(preferredCategories).join(", ")}.`
+        : `Latest society to join SocSync. You follow societies in: ${Array.from(preferredCategories).join(", ")} — explore something new.`
       : "A strong place to start if you want a society with active events and an easy first entry point.";
 
   return (
@@ -68,7 +74,7 @@ function SocietiesLayoutContent({
           </div>
         </section>
 
-        {featuredSociety && (
+        {!loading && featuredSociety && (
           <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch">
             <div className="flex h-full flex-col gap-4">
               <div className="space-y-1">

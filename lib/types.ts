@@ -20,6 +20,8 @@ export interface Society {
   category: EventCategory;
   description: string;
   followerCount: number;
+  /** ISO timestamp from DB; used to prioritize new societies in recommendations */
+  createdAt?: string;
 }
 
 export interface Event {

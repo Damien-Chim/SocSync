@@ -257,11 +257,11 @@ EVENT_SCHEMA = {
 }
 
 
-def extract_registration_link(text: str) -> Optional[str]:
+def extract_registration_link(text: str, fallback_url: Optional[str] = None) -> Optional[str]:
     for link in re.findall(r"https?://[^\s]+", text or ""):
         if "instagram.com" not in link.lower():
             return link
-    return None
+    return fallback_url.strip() if fallback_url and fallback_url.strip() else None
 
 
 def build_prompt(post: Dict[str, Any]) -> str:
@@ -314,7 +314,10 @@ def call_llm(post: Dict[str, Any], client: OpenAI) -> Dict[str, Any]:
     parsed = json.loads(response.output_text)
 
     if not parsed.get("external_registration_link"):
-        parsed["external_registration_link"] = extract_registration_link(post.get("caption", ""))
+        parsed["external_registration_link"] = extract_registration_link(
+            post.get("caption", ""),
+            post.get("url"),
+        )
 
     parsed["poster_image"] = post.get("image")
 
@@ -463,7 +466,10 @@ def upload_events_to_supabase(
             "location":           ev.get("location") or "TBA",
             "price":              None if ev.get("free_event") in (True, None) else 0,
             "has_free_food":      bool(ev.get("free_food")),
-            "registration_link":  ev.get("external_registration_link"),
+            "registration_link": (
+                ev.get("external_registration_link")
+                or record.get("source_url")
+            ),
             "banner_image_url":   ev.get("poster_image"),
             "category":           category,
             "instagram_post_url": record.get("source_url"),

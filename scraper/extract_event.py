@@ -81,8 +81,8 @@ EVENT_SCHEMA = {
 
 def extract_registration_link(text: str, fallback_url: Optional[str] = None) -> Optional[str]:
     """
-    Very simple URL finder.
-    If no external link is in the caption, returns None.
+    Very simple URL finder: prefer a non-Instagram link from the caption.
+    If none, use the Instagram post URL as a placeholder for registration/details.
     """
     import re
 
@@ -92,7 +92,7 @@ def extract_registration_link(text: str, fallback_url: Optional[str] = None) -> 
         for link in matches:
             if "instagram.com" not in link.lower():
                 return link
-    return None
+    return fallback_url.strip() if fallback_url and fallback_url.strip() else None
 
 
 def build_prompt(post: Dict[str, Any]) -> str:

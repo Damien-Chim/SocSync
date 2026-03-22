@@ -102,7 +102,10 @@ export async function POST(request: Request) {
               location: r.event!.location,
               freeEvent: r.event!.free_event,
               freeFood: r.event!.free_food,
-              registrationLink: r.event!.external_registration_link,
+              registrationLink:
+                r.event!.external_registration_link?.trim() ||
+                r.source_url ||
+                undefined,
               bannerImage: r.event!.poster_image,
             }));
         } catch {
