@@ -194,7 +194,10 @@ export default function HostDashboardPage() {
       location: pendingEvent.location ?? "TBA",
       price: pendingEvent.freeEvent === false ? 0 : null,
       has_free_food: !!pendingEvent.freeFood,
-      registration_link: pendingEvent.registrationLink ?? null,
+      registration_link:
+        pendingEvent.registrationLink?.trim() ||
+        pendingEvent.sourceUrl ||
+        null,
       banner_image_url: pendingEvent.bannerImage ?? null,
       category,
       instagram_post_url: pendingEvent.sourceUrl ?? null,
