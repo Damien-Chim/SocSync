@@ -97,6 +97,26 @@ export default function SignupPage() {
       return;
     }
 
+    if (role === "host" && instagramUsername) {
+      try {
+        const verifyRes = await fetch("/api/verify-instagram", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: instagramUsername }),
+        });
+        const verifyData = await verifyRes.json();
+        if (!verifyData.valid) {
+          setError(verifyData.error || "Instagram page could not be verified.");
+          setLoading(false);
+          return;
+        }
+      } catch {
+        setError("Could not verify Instagram page. Please try again.");
+        setLoading(false);
+        return;
+      }
+    }
+
     const supabase = createClient();
 
     console.log("[Signup] Attempting signup for:", formData.email, "role:", role);
@@ -169,22 +189,32 @@ export default function SignupPage() {
         }
       }
 
-      if (instagramUsername) {
+      if (instagramUsername && profile?.society_id) {
         try {
           const response = await fetch("/api/scrape-instagram", {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ username: instagramUsername }),
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              username: instagramUsername,
+              societyId: profile.society_id,
+            }),
           });
 
-          if (!response.ok) {
+          if (response.ok) {
+            const payload = await response.json();
+            const events = payload.events ?? [];
+            if (events.length > 0) {
+              sessionStorage.setItem(
+                "pendingScrapedEvents",
+                JSON.stringify({ events, societyId: profile.society_id })
+              );
+            }
+          } else {
             const payload = await response.json().catch(() => null);
-            console.error("[Signup] Scraper trigger failed:", payload?.error ?? response.statusText);
+            console.error("[Signup] Scraper failed:", payload?.error ?? response.statusText);
           }
         } catch (scrapeError) {
-          console.error("[Signup] Scraper trigger failed:", scrapeError);
+          console.error("[Signup] Scraper failed:", scrapeError);
         }
       }
     }
@@ -356,12 +386,16 @@ export default function SignupPage() {
                     <Label htmlFor="instagramLink">Instagram Link</Label>
                     <Input
                       id="instagramLink"
-                      type="url"
-                      placeholder="https://instagram.com/yoursociety"
+                      type="text"
+                      placeholder="https://instagram.com/yoursociety or @yoursociety"
                       value={formData.instagramLink}
                       onChange={(e) => setFormData({ ...formData, instagramLink: e.target.value })}
+                      required
                       className="h-11"
                     />
+                    <p className="text-xs text-muted-foreground">
+                      We&apos;ll verify this page exists before creating your account
+                    </p>
                   </div>
                 </>
               )}
@@ -432,6 +466,7 @@ export default function SignupPage() {
           </CardContent>
         </Card>
       </div>
+
     </div>
   );
 }

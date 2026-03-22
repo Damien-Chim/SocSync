@@ -78,9 +78,13 @@ CREATE TABLE events (
   registration_link TEXT,
   banner_image_url TEXT,
   category event_category NOT NULL,
+  instagram_post_url TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_events_instagram_url
+  ON events(instagram_post_url) WHERE instagram_post_url IS NOT NULL;
 
 -- Saved events (student bookmarks an event)
 CREATE TABLE saved_events (

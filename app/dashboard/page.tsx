@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { type ReactNode, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { EventCard } from "@/components/event-card";
 import { SavedEventsProvider, useSavedEvents } from "@/components/saved-events-context";
@@ -11,14 +11,21 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { getScrapedEvents } from "@/lib/scraped-events";
 import { cn } from "@/lib/utils";
 import type { Event, EventCategory } from "@/lib/types";
+import {
+  getEventLocalDateMs,
+  getEventLocalMs,
+  normalizeDbDate,
+  normalizeDbTime,
+} from "@/lib/event-datetime";
+import { createClient } from "@/lib/supabase/client";
 import {
   ArrowUpRight,
   Bookmark,
   Calendar,
   Clock,
+  Loader2,
   MapPin,
   Search,
 } from "lucide-react";
@@ -31,13 +38,52 @@ export default function DashboardPage() {
   );
 }
 
+function mapDbEventToEvent(
+  row: Record<string, unknown>,
+  saveCountOverride?: number
+): Event {
+  const date = normalizeDbDate(row.date);
+  const time = normalizeDbTime(row.time);
+  const soc = row.societies as Record<string, unknown> | null | undefined;
+  const fromJoin = soc != null;
+  return {
+    id: row.id as string,
+    title: row.title as string,
+    description: (row.description as string) ?? "",
+    society: {
+      id: row.society_id as string,
+      name: (fromJoin ? (soc?.name as string) : (row.society_name as string)) ?? "",
+      logo: (fromJoin ? (soc?.logo_url as string) : (row.society_logo as string)) ?? "",
+      category: (fromJoin
+        ? (soc?.category as EventCategory)
+        : (row.society_category as EventCategory)) ?? "Tech",
+      description: "",
+      followerCount: 0,
+    },
+    date,
+    time,
+    location: (row.location as string) ?? "",
+    coordinates: {
+      lat: (row.latitude as number) ?? 0,
+      lng: (row.longitude as number) ?? 0,
+    },
+    price: row.price == null ? "Free" : Number(row.price),
+    hasFreeFood: (row.has_free_food as boolean) ?? false,
+    registrationLink: (row.registration_link as string) ?? "",
+    bannerImage: (row.banner_image_url as string) ?? "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=400&fit=crop",
+    category: (row.category as EventCategory) ?? "Tech",
+    saveCount: saveCountOverride ?? (row.save_count as number) ?? 0,
+  };
+}
+
 function getEventTimestamp(event: Event) {
-  const time = event.time || "00:00";
-  return new Date(`${event.date}T${time}`).getTime();
+  const t = getEventLocalMs(event.date, event.time || "00:00");
+  return Number.isNaN(t) ? 0 : t;
 }
 
 function getEventDateTimestamp(event: Event) {
-  return new Date(`${event.date}T00:00:00`).getTime();
+  const t = getEventLocalDateMs(event.date);
+  return Number.isNaN(t) ? 0 : t;
 }
 
 function DashboardContent() {
@@ -45,11 +91,49 @@ function DashboardContent() {
   const [selectedCategories, setSelectedCategories] = useState<EventCategory[]>([]);
   const [freeFoodOnly, setFreeFoodOnly] = useState(false);
   const [freeEventsOnly, setFreeEventsOnly] = useState(false);
+  const [allEvents, setAllEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const allEvents = useMemo(
-    () => getScrapedEvents(),
-    []
-  );
+  const supabase = useMemo(() => createClient(), []);
+
+  useEffect(() => {
+    async function loadEvents() {
+      const { data: rows, error } = await supabase
+        .from("events")
+        .select(`
+          *,
+          societies (
+            name,
+            logo_url,
+            category
+          )
+        `)
+        .order("created_at", { ascending: false });
+
+      let saveById = new Map<string, number>();
+      const { data: detailRows } = await supabase
+        .from("events_with_details")
+        .select("id, save_count");
+      if (detailRows) {
+        for (const r of detailRows) {
+          saveById.set(r.id as string, (r.save_count as number) ?? 0);
+        }
+      }
+
+      if (error) {
+        console.error("[Dashboard] Failed to load events:", error.message);
+      } else if (rows) {
+        setAllEvents(
+          rows.map((row) =>
+            mapDbEventToEvent(row as Record<string, unknown>, saveById.get(row.id as string))
+          )
+        );
+      }
+      setLoading(false);
+    }
+
+    loadEvents();
+  }, [supabase]);
 
   const featuredCandidates = useMemo(() => {
     return [...allEvents].sort((a, b) => {
@@ -117,6 +201,11 @@ function DashboardContent() {
 
   return (
     <AppShell userRole="student">
+      {loading ? (
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      ) : (
       <div className="space-y-8">
         <section className="overflow-hidden rounded-[2rem] border border-border/60 bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(250,246,255,0.9)_45%,rgba(255,243,228,0.92))] shadow-[0_24px_80px_rgba(24,24,27,0.08)]">
           <div className="px-6 py-7 lg:px-8">
@@ -261,7 +350,7 @@ function DashboardContent() {
               <div>
                 <div>
                   <h2 className="text-2xl px-4 font-semibold tracking-[-0.03em] text-foreground">
-                    ALL UPCOMING
+                    ALL EVENTS
                   </h2>
                 </div>
               </div>
@@ -320,6 +409,7 @@ function DashboardContent() {
           </div>
         )}
       </div>
+      )}
     </AppShell>
   );
 }
