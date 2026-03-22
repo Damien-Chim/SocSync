@@ -5,23 +5,28 @@ Runs the full Instagram → events pipeline in one go:
   1. scrape_posts        → posts.json
   2. scrape_post_details → post_details.json
   3. extract_events      → events.json
+  4. upload_to_supabase  → inserts upcoming events into DB
 
 Usage:
-    python run_pipeline.py --account <instagram_handle>
+    python run_pipeline.py --account <instagram_handle> --society-id <uuid>
 """
 
 import argparse
 import json
 import os
 import re
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from dateutil import parser as dateparser
 from dotenv import load_dotenv
 from openai import OpenAI
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
+from supabase import create_client as create_supabase_client
 
 load_dotenv()
+load_dotenv(Path(__file__).resolve().parent.parent / ".env.local", override=True)
 
 # ── Config ────────────────────────────────────────────────────────────────────
 AUTH_FILE   = "ig_auth.json"
@@ -345,12 +350,143 @@ def extract_events(posts: list[dict]) -> list[dict]:
 
 
 # ==============================================================================
+# STAGE 4 — filter & upload to Supabase
+# ==============================================================================
+
+CATEGORY_MAP: Dict[str, str] = {
+    "tech":       "Tech",
+    "finance":    "Finance",
+    "social":     "Social",
+    "industry":   "Networking",
+    "networking": "Networking",
+    "career":     "Career",
+    "workshop":   "Workshop",
+    "competition":"Competition",
+}
+
+
+def parse_date(raw: Optional[str]) -> Optional[str]:
+    """Try to parse a freeform date string into YYYY-MM-DD."""
+    if not raw:
+        return None
+    cleaned = re.sub(r"\(.*?\)", "", raw).strip()
+    try:
+        dt = dateparser.parse(cleaned, dayfirst=True, fuzzy=True)
+        if dt is None:
+            return None
+        if dt.year < 2000:
+            dt = dt.replace(year=date.today().year)
+        return dt.strftime("%Y-%m-%d")
+    except (ValueError, OverflowError):
+        return None
+
+
+def parse_time_range(raw: Optional[str]) -> tuple[Optional[str], Optional[str]]:
+    """Parse a time string like '6-8PM' or '11:00AM-12:00PM' into (HH:MM, HH:MM)."""
+    if not raw:
+        return None, None
+
+    raw = raw.strip().replace("–", "-").replace("—", "-")
+
+    parts = re.split(r"\s*[-–—]\s*", raw, maxsplit=1)
+
+    def to_hhmm(s: str, fallback_suffix: str = "") -> Optional[str]:
+        s = s.strip()
+        if not s:
+            return None
+        if not re.search(r"[AaPp][Mm]", s) and fallback_suffix:
+            s = s + fallback_suffix
+        try:
+            dt = dateparser.parse(s, fuzzy=True)
+            return dt.strftime("%H:%M") if dt else None
+        except (ValueError, OverflowError):
+            return None
+
+    if len(parts) == 2:
+        suffix_match = re.search(r"([AaPp][Mm])\s*$", parts[1])
+        suffix = suffix_match.group(1) if suffix_match else ""
+        start = to_hhmm(parts[0], suffix)
+        end = to_hhmm(parts[1])
+        return start, end
+
+    start = to_hhmm(parts[0])
+    return start, None
+
+
+def upload_events_to_supabase(
+    events: List[Dict[str, Any]],
+    society_id: str,
+) -> int:
+    """Filter for upcoming events and insert into Supabase. Returns count inserted."""
+    supabase_url = os.getenv("NEXT_PUBLIC_SUPABASE_URL")
+    service_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+
+    if not supabase_url or not service_key:
+        print("  [skip] SUPABASE_SERVICE_ROLE_KEY or NEXT_PUBLIC_SUPABASE_URL not set.")
+        return 0
+
+    sb = create_supabase_client(supabase_url, service_key)
+    today = date.today().isoformat()
+    inserted = 0
+
+    for record in events:
+        ev = record.get("event")
+        if not ev or not ev.get("is_event_like"):
+            continue
+        if ev.get("confidence", 0) < 0.7:
+            continue
+
+        parsed_date = parse_date(ev.get("date"))
+        if not parsed_date or parsed_date < today:
+            continue
+
+        title = ev.get("event_title")
+        if not title:
+            continue
+
+        start_time, end_time = parse_time_range(ev.get("time"))
+
+        raw_cat = (ev.get("category") or "").lower()
+        category = CATEGORY_MAP.get(raw_cat, "Social")
+
+        row = {
+            "title":              title,
+            "description":        ev.get("description") or "",
+            "society_id":         society_id,
+            "date":               parsed_date,
+            "time":               start_time or "00:00",
+            "end_time":           end_time,
+            "location":           ev.get("location") or "TBA",
+            "price":              None if ev.get("free_event") in (True, None) else 0,
+            "has_free_food":      bool(ev.get("free_food")),
+            "registration_link":  ev.get("external_registration_link"),
+            "banner_image_url":   ev.get("poster_image"),
+            "category":           category,
+            "instagram_post_url": record.get("source_url"),
+        }
+
+        try:
+            sb.table("events").upsert(
+                row,
+                on_conflict="instagram_post_url",
+            ).execute()
+            inserted += 1
+            print(f"  ✓ Inserted: {title} ({parsed_date})")
+        except Exception as e:
+            print(f"  ✗ Failed to insert '{title}': {e}")
+
+    return inserted
+
+
+# ==============================================================================
 # MAIN PIPELINE
 # ==============================================================================
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Full Instagram → events pipeline.")
     parser.add_argument("--account", required=True, help="Instagram username (no @)")
+    parser.add_argument("--society-id", required=False, default=None,
+                        help="Supabase society UUID to link events to")
     args = parser.parse_args()
 
     if not Path(AUTH_FILE).exists():
@@ -365,7 +501,7 @@ def main() -> None:
 
     # ── Stage 2 ───────────────────────────────────────────────────────────────
     print("\n── Stage 2: Scraping post details ───────────────────────────────────")
-    details = scrape_post_details(posts[:10])
+    details = scrape_post_details(posts[:1])
     with open(DETAILS_FILE, "w", encoding="utf-8") as f:
         json.dump(details, f, indent=2, ensure_ascii=False)
     print(f"✓ {len(details)} post details saved to {DETAILS_FILE}")
