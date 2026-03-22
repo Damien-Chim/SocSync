@@ -144,7 +144,7 @@ def extract_caption_from_post(page) -> str:
     return ""
 
 
-def scrape_post_details(post_urls: list[str]) -> list[dict]:
+def scrape_post_details(posts: list[dict]) -> list[dict]:
     details = []
 
     with sync_playwright() as p:
@@ -152,7 +152,8 @@ def scrape_post_details(post_urls: list[str]) -> list[dict]:
         context = browser.new_context(storage_state=AUTH_FILE)
         page = context.new_page()
 
-        for url in post_urls:
+        for post in posts:
+            url = post.get("href", "")
             print(f"  Fetching details: {url}")
             try:
                 page.goto(url, wait_until="domcontentloaded", timeout=30000)
@@ -167,11 +168,22 @@ def scrape_post_details(post_urls: list[str]) -> list[dict]:
                         pass
 
                 caption = extract_caption_from_post(page)
-                details.append({"url": url, "caption": caption})
+                details.append({
+                    "url": url,
+                    "caption": caption,
+                    "image": post.get("image"),
+                    "alt": post.get("alt"),
+                })
                 print(f"  Caption: {caption[:80] if caption else '[NONE]'}")
 
             except Exception as e:
-                details.append({"url": url, "caption": "", "error": f"{type(e).__name__}: {e}"})
+                details.append({
+                    "url": url,
+                    "caption": "",
+                    "image": post.get("image"),
+                    "alt": post.get("alt"),
+                    "error": f"{type(e).__name__}: {e}",
+                })
                 print(f"  Error: {e}")
 
         browser.close()
@@ -300,6 +312,8 @@ def call_llm(post: Dict[str, Any], client: OpenAI) -> Dict[str, Any]:
     if not parsed.get("external_registration_link"):
         parsed["external_registration_link"] = extract_registration_link(post.get("caption", ""))
 
+    parsed["poster_image"] = post.get("image")
+
     return parsed
 
 
@@ -314,6 +328,7 @@ def extract_events(posts: list[dict]) -> list[dict]:
             results.append({
                 "source_url":     post.get("url"),
                 "source_caption": post.get("caption"),
+                "source_image":   post.get("image"),
                 "event":          extracted,
             })
         except Exception as e:
@@ -321,6 +336,7 @@ def extract_events(posts: list[dict]) -> list[dict]:
             results.append({
                 "source_url":     post.get("url"),
                 "source_caption": post.get("caption"),
+                "source_image":   post.get("image"),
                 "event":          None,
                 "error":          f"{type(e).__name__}: {e}",
             })
@@ -349,8 +365,7 @@ def main() -> None:
 
     # ── Stage 2 ───────────────────────────────────────────────────────────────
     print("\n── Stage 2: Scraping post details ───────────────────────────────────")
-    urls = [p["href"] for p in posts]
-    details = scrape_post_details(urls[:10])
+    details = scrape_post_details(posts[:10])
     with open(DETAILS_FILE, "w", encoding="utf-8") as f:
         json.dump(details, f, indent=2, ensure_ascii=False)
     print(f"✓ {len(details)} post details saved to {DETAILS_FILE}")
