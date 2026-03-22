@@ -4,9 +4,25 @@ import { useState, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Zap, Eye, EyeOff, Upload, User, Building2, Loader2, X } from "lucide-react";
+import {
+  ArrowLeft,
+  Zap,
+  Eye,
+  EyeOff,
+  Upload,
+  User,
+  Building2,
+  Loader2,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
@@ -72,7 +88,7 @@ export default function SignupPage() {
       const file = e.dataTransfer.files[0];
       if (file) handleFileSelect(file);
     },
-    [handleFileSelect]
+    [handleFileSelect],
   );
 
   const clearLogo = useCallback(() => {
@@ -91,7 +107,11 @@ export default function SignupPage() {
         ? extractInstagramUsername(formData.instagramLink)
         : null;
 
-    if (role === "host" && formData.instagramLink.trim() && !instagramUsername) {
+    if (
+      role === "host" &&
+      formData.instagramLink.trim() &&
+      !instagramUsername
+    ) {
       setError("Please enter a valid Instagram username or link.");
       setLoading(false);
       return;
@@ -119,7 +139,12 @@ export default function SignupPage() {
 
     const supabase = createClient();
 
-    console.log("[Signup] Attempting signup for:", formData.email, "role:", role);
+    console.log(
+      "[Signup] Attempting signup for:",
+      formData.email,
+      "role:",
+      role,
+    );
 
     const { data, error: authError } = await supabase.auth.signUp({
       email: formData.email,
@@ -206,12 +231,15 @@ export default function SignupPage() {
             if (events.length > 0) {
               sessionStorage.setItem(
                 "pendingScrapedEvents",
-                JSON.stringify({ events, societyId: profile.society_id })
+                JSON.stringify({ events, societyId: profile.society_id }),
               );
             }
           } else {
             const payload = await response.json().catch(() => null);
-            console.error("[Signup] Scraper failed:", payload?.error ?? response.statusText);
+            console.error(
+              "[Signup] Scraper failed:",
+              payload?.error ?? response.statusText,
+            );
           }
         } catch (scrapeError) {
           console.error("[Signup] Scraper failed:", scrapeError);
@@ -247,7 +275,9 @@ export default function SignupPage() {
 
         <Card className="border-0 shadow-2xl shadow-primary/10">
           <CardHeader className="space-y-1 pb-4">
-            <CardTitle className="text-2xl font-bold text-center">Create an account</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">
+              Create an account
+            </CardTitle>
             <CardDescription className="text-center">
               Join the university events community
             </CardDescription>
@@ -262,7 +292,7 @@ export default function SignupPage() {
                   "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all duration-200",
                   role === "student"
                     ? "border-primary bg-primary/5 text-primary"
-                    : "border-border hover:border-primary/50 text-muted-foreground hover:text-foreground"
+                    : "border-border hover:border-primary/50 text-muted-foreground hover:text-foreground",
                 )}
               >
                 <User className="h-6 w-6" />
@@ -275,7 +305,7 @@ export default function SignupPage() {
                   "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all duration-200",
                   role === "host"
                     ? "border-accent bg-accent/10 text-accent-foreground"
-                    : "border-border hover:border-accent/50 text-muted-foreground hover:text-foreground"
+                    : "border-border hover:border-accent/50 text-muted-foreground hover:text-foreground",
                 )}
               >
                 <Building2 className="h-6 w-6" />
@@ -291,13 +321,17 @@ export default function SignupPage() {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="name">{role === "host" ? "Your Name" : "Full Name"}</Label>
+                <Label htmlFor="name">
+                  {role === "host" ? "Your Name" : "Full Name"}
+                </Label>
                 <Input
                   id="name"
                   type="text"
                   placeholder="Enter your name"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                   required
                   className="h-11"
                 />
@@ -312,7 +346,12 @@ export default function SignupPage() {
                       type="text"
                       placeholder="e.g., Tech Society"
                       value={formData.societyName}
-                      onChange={(e) => setFormData({ ...formData, societyName: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          societyName: e.target.value,
+                        })
+                      }
                       required
                       className="h-11"
                     />
@@ -361,21 +400,29 @@ export default function SignupPage() {
                         role="button"
                         tabIndex={0}
                         onClick={() => fileInputRef.current?.click()}
-                        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") fileInputRef.current?.click(); }}
-                        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ")
+                            fileInputRef.current?.click();
+                        }}
+                        onDragOver={(e) => {
+                          e.preventDefault();
+                          setIsDragging(true);
+                        }}
                         onDragLeave={() => setIsDragging(false)}
                         onDrop={handleDrop}
                         className={cn(
                           "flex items-center justify-center w-full h-24 border-2 border-dashed rounded-xl transition-colors cursor-pointer",
                           isDragging
                             ? "border-primary bg-primary/10"
-                            : "border-border hover:border-primary/50 bg-muted/30"
+                            : "border-border hover:border-primary/50 bg-muted/30",
                         )}
                       >
                         <div className="flex flex-col items-center gap-1 text-muted-foreground">
                           <Upload className="h-6 w-6" />
                           <span className="text-sm">
-                            {isDragging ? "Drop image here" : "Click or drag to upload"}
+                            {isDragging
+                              ? "Drop image here"
+                              : "Click or drag to upload"}
                           </span>
                         </div>
                       </div>
@@ -389,12 +436,18 @@ export default function SignupPage() {
                       type="text"
                       placeholder="https://instagram.com/yoursociety or @yoursociety"
                       value={formData.instagramLink}
-                      onChange={(e) => setFormData({ ...formData, instagramLink: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          instagramLink: e.target.value,
+                        })
+                      }
                       required
                       className="h-11"
                     />
                     <p className="text-xs text-muted-foreground">
-                      We&apos;ll verify this page exists before creating your account
+                      We&apos;ll verify this page exists before creating your
+                      account
                     </p>
                   </div>
                 </>
@@ -407,7 +460,9 @@ export default function SignupPage() {
                   type="email"
                   placeholder="you@university.edu"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                   required
                   className="h-11"
                 />
@@ -421,7 +476,9 @@ export default function SignupPage() {
                     type={showPassword ? "text" : "password"}
                     placeholder="Create a password (min 6 characters)"
                     value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
                     required
                     minLength={6}
                     className="h-11 pr-10"
@@ -431,7 +488,11 @@ export default function SignupPage() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -443,7 +504,7 @@ export default function SignupPage() {
                   "w-full h-11 text-base font-semibold",
                   role === "host"
                     ? "bg-accent text-accent-foreground hover:bg-accent/90"
-                    : "bg-primary hover:bg-primary/90"
+                    : "bg-primary hover:bg-primary/90",
                 )}
               >
                 {loading ? (
@@ -458,15 +519,19 @@ export default function SignupPage() {
             </form>
 
             <div className="mt-6 text-center text-sm">
-              <span className="text-muted-foreground">Already have an account? </span>
-              <Link href="/login" className="font-semibold text-primary hover:underline">
+              <span className="text-muted-foreground">
+                Already have an account?{" "}
+              </span>
+              <Link
+                href="/login"
+                className="font-semibold text-primary hover:underline"
+              >
                 Sign in
               </Link>
             </div>
           </CardContent>
         </Card>
       </div>
-
     </div>
   );
 }

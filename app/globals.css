@@ -3,79 +3,80 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Earth editorial palette — matches landing (warm paper, terracotta primary, ink text) */
 :root {
-  --background: oklch(0.98 0.005 285);
-  --foreground: oklch(0.2 0.02 285);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2 0.02 285);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.2 0.02 285);
-  --primary: oklch(0.55 0.25 285);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.96 0.02 285);
-  --secondary-foreground: oklch(0.35 0.15 285);
-  --muted: oklch(0.94 0.01 285);
-  --muted-foreground: oklch(0.5 0.05 285);
-  --accent: oklch(0.7 0.2 45);
-  --accent-foreground: oklch(0.25 0.05 45);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.9 0.02 285);
-  --input: oklch(0.92 0.01 285);
-  --ring: oklch(0.55 0.25 285);
-  --chart-1: oklch(0.55 0.25 285);
-  --chart-2: oklch(0.7 0.2 45);
-  --chart-3: oklch(0.6 0.15 180);
-  --chart-4: oklch(0.65 0.2 330);
-  --chart-5: oklch(0.75 0.15 120);
+  --background: oklch(0.93 0.012 78);
+  --foreground: oklch(0.2 0.014 48);
+  --card: oklch(0.98 0.01 82);
+  --card-foreground: oklch(0.2 0.014 48);
+  --popover: oklch(0.98 0.01 82);
+  --popover-foreground: oklch(0.2 0.014 48);
+  --primary: oklch(0.38 0.11 36);
+  --primary-foreground: oklch(0.98 0.01 82);
+  --secondary: oklch(0.91 0.014 78);
+  --secondary-foreground: oklch(0.28 0.04 42);
+  --muted: oklch(0.9 0.012 78);
+  --muted-foreground: oklch(0.45 0.018 52);
+  --accent: oklch(0.44 0.13 38);
+  --accent-foreground: oklch(0.98 0.01 82);
+  --destructive: oklch(0.5 0.2 25);
+  --destructive-foreground: oklch(0.98 0.01 85);
+  --border: oklch(0.83 0.018 72);
+  --input: oklch(0.88 0.014 75);
+  --ring: oklch(0.38 0.11 36);
+  --chart-1: oklch(0.38 0.11 36);
+  --chart-2: oklch(0.44 0.13 38);
+  --chart-3: oklch(0.52 0.08 145);
+  --chart-4: oklch(0.58 0.1 65);
+  --chart-5: oklch(0.72 0.06 78);
   --radius: 0.75rem;
-  --sidebar: oklch(0.25 0.08 285);
-  --sidebar-foreground: oklch(0.95 0.01 285);
-  --sidebar-primary: oklch(0.7 0.2 45);
-  --sidebar-primary-foreground: oklch(0.15 0.02 285);
-  --sidebar-accent: oklch(0.35 0.1 285);
-  --sidebar-accent-foreground: oklch(0.95 0.01 285);
-  --sidebar-border: oklch(0.35 0.08 285);
-  --sidebar-ring: oklch(0.7 0.2 45);
+  --sidebar: oklch(0.25 0.022 48);
+  --sidebar-foreground: oklch(0.95 0.012 82);
+  --sidebar-primary: oklch(0.44 0.13 38);
+  --sidebar-primary-foreground: oklch(0.98 0.01 82);
+  --sidebar-accent: oklch(0.3 0.02 48);
+  --sidebar-accent-foreground: oklch(0.95 0.012 82);
+  --sidebar-border: oklch(0.32 0.02 50);
+  --sidebar-ring: oklch(0.44 0.13 38);
 }
 
 .dark {
-  --background: oklch(0.15 0.03 285);
-  --foreground: oklch(0.95 0.01 285);
-  --card: oklch(0.2 0.04 285);
-  --card-foreground: oklch(0.95 0.01 285);
-  --popover: oklch(0.2 0.04 285);
-  --popover-foreground: oklch(0.95 0.01 285);
-  --primary: oklch(0.65 0.25 285);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.25 0.06 285);
-  --secondary-foreground: oklch(0.9 0.02 285);
-  --muted: oklch(0.25 0.04 285);
-  --muted-foreground: oklch(0.65 0.03 285);
-  --accent: oklch(0.75 0.2 45);
-  --accent-foreground: oklch(0.15 0.03 45);
-  --destructive: oklch(0.5 0.2 25);
-  --destructive-foreground: oklch(0.95 0.01 25);
-  --border: oklch(0.3 0.05 285);
-  --input: oklch(0.25 0.04 285);
-  --ring: oklch(0.65 0.25 285);
-  --chart-1: oklch(0.65 0.25 285);
-  --chart-2: oklch(0.75 0.2 45);
-  --chart-3: oklch(0.65 0.15 180);
-  --chart-4: oklch(0.7 0.2 330);
-  --chart-5: oklch(0.8 0.15 120);
-  --sidebar: oklch(0.18 0.05 285);
-  --sidebar-foreground: oklch(0.95 0.01 285);
-  --sidebar-primary: oklch(0.75 0.2 45);
-  --sidebar-primary-foreground: oklch(0.15 0.02 285);
-  --sidebar-accent: oklch(0.28 0.08 285);
-  --sidebar-accent-foreground: oklch(0.95 0.01 285);
-  --sidebar-border: oklch(0.28 0.06 285);
-  --sidebar-ring: oklch(0.75 0.2 45);
+  --background: oklch(0.17 0.015 55);
+  --foreground: oklch(0.95 0.012 82);
+  --card: oklch(0.21 0.018 55);
+  --card-foreground: oklch(0.95 0.012 82);
+  --popover: oklch(0.21 0.018 55);
+  --popover-foreground: oklch(0.95 0.012 82);
+  --primary: oklch(0.58 0.1 42);
+  --primary-foreground: oklch(0.15 0.02 48);
+  --secondary: oklch(0.26 0.02 55);
+  --secondary-foreground: oklch(0.92 0.015 82);
+  --muted: oklch(0.26 0.018 55);
+  --muted-foreground: oklch(0.68 0.02 72);
+  --accent: oklch(0.55 0.11 42);
+  --accent-foreground: oklch(0.98 0.01 82);
+  --destructive: oklch(0.55 0.18 25);
+  --destructive-foreground: oklch(0.98 0.01 85);
+  --border: oklch(0.3 0.02 52);
+  --input: oklch(0.26 0.018 55);
+  --ring: oklch(0.58 0.1 42);
+  --chart-1: oklch(0.58 0.1 42);
+  --chart-2: oklch(0.62 0.1 45);
+  --chart-3: oklch(0.55 0.08 145);
+  --chart-4: oklch(0.6 0.08 65);
+  --chart-5: oklch(0.68 0.06 78);
+  --sidebar: oklch(0.16 0.015 52);
+  --sidebar-foreground: oklch(0.95 0.012 82);
+  --sidebar-primary: oklch(0.55 0.1 42);
+  --sidebar-primary-foreground: oklch(0.98 0.01 82);
+  --sidebar-accent: oklch(0.26 0.02 55);
+  --sidebar-accent-foreground: oklch(0.95 0.012 82);
+  --sidebar-border: oklch(0.28 0.02 52);
+  --sidebar-ring: oklch(0.55 0.1 42);
 }
 
 @theme inline {
-  --font-sans: var(--font-plus-jakarta), 'Segoe UI', sans-serif;
+  --font-sans: var(--font-space-grotesk), var(--font-plus-jakarta), ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'Geist Mono', 'Geist Mono Fallback';
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -120,6 +121,84 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply text-foreground font-sans antialiased;
+    background-color: var(--background);
+    /* Warm ambient gradients — same family as landing, very subtle on app surfaces */
+    background-image:
+      radial-gradient(ellipse 100% 70% at 50% -25%, color-mix(in oklch, var(--primary) 10%, transparent) 0%, transparent 55%),
+      radial-gradient(ellipse 55% 45% at 100% 0%, color-mix(in oklch, var(--accent) 7%, transparent) 0%, transparent 50%),
+      radial-gradient(ellipse 50% 40% at 0% 100%, color-mix(in oklch, var(--primary) 6%, transparent) 0%, transparent 45%);
+    background-attachment: fixed;
   }
+}
+
+/* ─── Landing page: Fraunces + aliases to global theme (single source of truth) ─── */
+.landing-page {
+  --lp-bg: var(--background);
+  --lp-ink: var(--foreground);
+  --lp-muted: var(--muted-foreground);
+  --lp-accent: var(--primary);
+  --lp-line: var(--border);
+  --lp-paper: var(--card);
+  --lp-surface: var(--muted);
+  --lp-rust: var(--accent);
+  font-family: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+  /* Slightly stronger landing wash so hero matches marketing intent */
+  background-image:
+    radial-gradient(ellipse 100% 75% at 50% -30%, color-mix(in oklch, var(--primary) 14%, transparent) 0%, transparent 58%),
+    radial-gradient(ellipse 60% 50% at 100% 5%, color-mix(in oklch, var(--accent) 10%, transparent) 0%, transparent 52%),
+    radial-gradient(ellipse 55% 45% at 0% 95%, color-mix(in oklch, var(--primary) 8%, transparent) 0%, transparent 48%);
+  background-attachment: fixed;
+}
+
+.landing-page .landing-serif,
+.landing-page h1,
+.landing-page h2,
+.landing-page h3 {
+  font-family: var(--font-fraunces), ui-serif, Georgia, "Times New Roman", serif;
+}
+
+.landing-page .landing-link {
+  color: var(--lp-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+
+.landing-page .landing-link:hover {
+  color: var(--lp-ink);
+  text-decoration-color: var(--lp-ink);
+}
+
+.landing-page .landing-link-muted {
+  color: var(--lp-muted);
+  text-decoration: none;
+}
+
+.landing-page .landing-link-muted:hover {
+  color: var(--lp-ink);
+}
+
+.landing-page ::selection {
+  background: var(--lp-line);
+  color: var(--lp-ink);
+}
+
+.landing-page .lp-border {
+  border-color: var(--lp-line);
+}
+
+.landing-page .lp-muted {
+  color: var(--lp-muted);
+}
+
+.landing-page .lp-surface {
+  background-color: var(--lp-surface);
+}
+
+.landing-page .lp-paper {
+  background-color: var(--lp-paper);
 }

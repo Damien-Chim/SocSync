@@ -139,10 +139,10 @@ export default function MapPage() {
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
                       <div
-                        className="w-3 h-3 rounded-full mt-1.5 flex-shrink-0"
-                        style={{
-                          backgroundColor: event.hasFreeFood ? "#f59e0b" : "#7c3aed",
-                        }}
+                        className={cn(
+                          "mt-1.5 h-3 w-3 flex-shrink-0 rounded-full",
+                          event.hasFreeFood ? "bg-amber-500" : "bg-primary"
+                        )}
                       />
                       <div className="flex-1 min-w-0">
                         <h3 className="font-medium text-foreground text-sm line-clamp-1">
